@@ -18,11 +18,20 @@
 				</div>
 			</div>
 		</div>
+		<div id="cells">
+			<mt-cell title="我的积分" is-link>
+			  <span slot="icon" class="iconfont icon-score"></span>
+			</mt-cell>
+			<mt-cell title="设置" is-link>
+			  <span slot="icon" class="iconfont icon-setting"></span>
+			</mt-cell>
+		</div>
 	</section>
 </template>
 
 <script>
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
+	import { Cell } from 'mint-ui';
 	export default{
 		components: {
 			HeaderTop,
