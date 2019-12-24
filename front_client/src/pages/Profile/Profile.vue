@@ -10,9 +10,12 @@
 					<p>登陆/注册&gt;&gt;</p>
 				</div>
 				<div class="logined">
-					<p>
+					<div class="lv">
+						<span>LV1</span>
+						<span>弟中弟</span>
+					</div>
+					<p class="name">
 						<strong>昵称</strong>
-						<strong>LV1</strong>
 					</p>
 					<p>今日未签到</p>
 				</div>
@@ -74,7 +77,7 @@
 				width: 9.17rem;
 				height: 100%;
 				div{
-					color: whitesmoke;
+					color: darkorange;
 					font-size: 1rem;
 					&.not-login{
 						p{
@@ -83,22 +86,34 @@
 						}
 					}
 					&.logined{
-						padding: 1.3rem;
-						p:nth-child(1){
-							strong{
+						padding: 1rem;
+						.lv{
+							>span{
 								&:nth-child(1){
-									font-size: 1.5rem;
+									width: 1.5rem;
+									height: .8rem;
+									line-height: .8rem;
+									font-size: .7rem;
+									display: inline-block;
+									background: orangered;
+									border-radius: 15%;
+									vertical-align: middle;
+									text-align: center;
 									vertical-align: middle;
 								}
 								&:nth-child(2){
-									width: 2rem;
-									font-size: 1rem;
 									display: inline-block;
-									background: orangered;
-									border-radius: 20%;
-									vertical-align: middle;
 									text-align: center;
+									width: 5rem;
+									font-size: .8rem;
+									vertical-align: middle;
 								}
+							}
+						}
+						.name{
+							font-size: 1.2rem;
+							strong{
+								
 							}
 						}
 						p{

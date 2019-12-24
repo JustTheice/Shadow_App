@@ -1,0 +1,22 @@
+/**
+ * 		1物理像素线
+ */
+
+.oneLine(@color){
+	position: relative;
+	&::before{
+		display: block;
+		width: 100%;
+		height: 1px;
+		content: '';
+		position: absolute;
+		bottom: 0;
+		background: @color;
+		@media only screen and (-webkit-device-pixel-ratio: 2) {
+			transform: scaleY(.5);
+		}
+		@media only screen and (-webkit-device-pixel-ratio: 3) {
+			transform: scaleY(.333);
+		}
+	}
+}

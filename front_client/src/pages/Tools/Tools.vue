@@ -1,12 +1,12 @@
 <template>
-	<section>
+	<section id="container">
 		<HeaderTop title="实用工具"></HeaderTop>
 		<section id="tools">
 			<div class="row row-life">
 				<h3>生活类</h3>
 				<div class="items">
 					<div class="item-tool">
-						<i class="iconfont"></i>
+						<i class="iconfont icon-weather"></i>
 						<span>天气预报</span>
 					</div>
 				</div>
@@ -38,17 +38,19 @@
 </script>
 
 <style lang="less">
+	@import '../../../static/css/mixin.less';
 	section{
 		#tools{
+			padding: .8rem;
 			.row{
 				box-sizing: border-box;
-				padding: .8rem;
 				width: 100%;
 				color: gray;
 				h3{
 					font-size: .9rem;
-					border-bottom: 1px solid gray;
-					color: gray;
+					// border-bottom: 1px solid gray;
+					// color: gray;
+					.oneLine(gray);
 					padding: .2rem 0;
 				}
 				.items{
@@ -57,9 +59,9 @@
 					flex-wrap: nowrap;
 					justify-content: flex-start;
 					.item-tool{
-						width: 33%;
+						width: 33.3%;
 						box-sizing: border-box;
-						padding: .1rem;
+						padding: .2rem;
 						height: 4rem;
 						text-align: center;
 						i{
@@ -68,6 +70,7 @@
 						span{
 							display: block;
 							font-size: .7rem;
+							margin-top: .2rem;
 						}
 					}
 				}
