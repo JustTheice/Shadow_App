@@ -14,7 +14,7 @@
 <style lang="less">
 	header{
 		width: 100%;
-		height: 2.5rem;
+		height: 2rem;
 		background: deepskyblue;
 		h2{
 			text-align: center;
@@ -22,15 +22,15 @@
 			margin: 0 auto;
 			color: white;
 			height: 100%;
-			font-size: 1.8rem;
-			line-height: 2.5rem;
+			font-size: 1.2rem;
+			line-height: 2rem;
 		}
 		a{
 			display: block;
-			font-size: 2rem!important;
-			width: 2rem;
-			height: 2rem;
-			padding: .25rem;
+			font-size: 1.6rem!important;
+			width: 1.6rem;
+			height: 1.6rem;
+			padding: .2rem;
 			border-radius: 50%;
 			float: right;
 		}

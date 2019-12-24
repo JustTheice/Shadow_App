@@ -31,7 +31,7 @@
 <style lang="less">
 	#nav{
 		width: 100%;
-		height: 4rem;
+		height: 2.8rem;
 		background: rgb(233,233,233);
 		position: fixed;
 		bottom: 0;
@@ -45,19 +45,19 @@
 		align-items: center;
 		a{
 			display: block;
-			width: 3rem;
-			height: 3.3rem;
+			width: 2rem;
+			height: 2.5rem;
 			text-align: center;
 			color: gray;
 			&.active{
 				color: deepskyblue;
 			}
 			i{
-				font-size: 2.2rem;
+				font-size: 1.7rem;
 			}
 			h2{
-				padding-top: .2rem;
-				font-size: .9rem;
+				padding-top: .15rem;
+				font-size: .55rem;
 			}
 		}
 	}

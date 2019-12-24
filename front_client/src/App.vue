@@ -13,7 +13,7 @@
 		mounted() {
 			//设置总宽为16rem，开启自适应布局
 			let remStyle = document.createElement('style');
-			remStyle.innerHTML = `{html: font-size: ${document.documentElement.clientWidth/16}px!important}`;
+			remStyle.innerHTML = `html{font-size: ${document.documentElement.clientWidth/16}px!important}`;
 			document.head.appendChild(remStyle);
 		},
 	}
