@@ -44,7 +44,7 @@
 		#info{
 			width: 16rem;
 			height: 5.83rem;
-			background: url(./img/info-bg.jpg);
+			background: url(./img/info-bg2.jpg);
 			background-size: 100% 100%;
 			.avatar{
 				float: left;
