@@ -1,6 +1,25 @@
 <template>
 	<section id="news">
 		<HeaderTop title="科技新闻"></HeaderTop>
+		<nav id="news-nav" ref="navTop">
+			<ul>
+				<li class="active">
+					<a href="#">IT综合</a>
+				</li>
+				<li>
+					<a href="#">游戏竞技</a>
+				</li>
+				<li>
+					<a href="#">影视</a>
+				</li>
+				<li>
+					<a href="#">动漫快车</a>
+				</li>
+				<li>
+					<a href="#">互联网</a>
+				</li>
+			</ul>
+		</nav>
 		<section id="container">
 			<ul>
 				<li>
@@ -31,16 +50,59 @@
 </template>
 
 <script>
+	import BScroll from 'better-scroll';
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
 	export default{
 		components: {
 			HeaderTop,
+		},
+		mounted() {
+			let navTop = this.$refs.navTop;
+			// navTop.querySelector('ul').style.width = ;
+			let navScroll = new BScroll(navTop, {
+				scrollY: false,
+				scrollX: true,
+				click: true
+			});
 		}
 	}
 </script>
 
 <style lang="less">
 	#news{
+		overflow: hidden;
+		#news-nav{
+			width: 100%;
+			height: 1.7rem;
+			box-sizing: border-box;
+			padding: .1rem;
+			background: rgb(233,233,233);
+			ul{
+				display: flex;
+				flex-direction: row;
+				white-space: nowrap;
+				float: left;
+				li{
+					height: 1.5rem;
+					box-sizing: border-box;
+					padding: .1rem;
+					margin: 0 .1rem;
+					display: inline-block;
+					transition: .3s;
+					&.active{
+						border-radius: .2rem;
+						background: limegreen;
+					}
+					a{
+						display: block;
+						height: 100%;
+						line-height: 1.3rem;
+						font-size: .9rem;
+						color: rgb(25,25,25);
+					}
+				}
+			}
+		}
 		#container{
 			ul{
 				width: 100%;
