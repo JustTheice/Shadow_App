@@ -13,9 +13,9 @@
 			<div class="content">
 				<ul>
 					<li>
-						<span class="title">我</span>
+						<span class="iconfont icon-avatar"></span>
 						<div>
-							<span class="iconfont icon-avatar">头像</span>
+							<p class="title">我</p>
 							<p>内容</p>
 						</div>
 					</li>
@@ -85,10 +85,15 @@
 				.oneLine(gray);
 				ul{
 					li{
-						.title{
-							font-size: .5rem;
-							>div{
-								display: inline-block;
+						>span{
+							float: left;
+							font-size: 2rem;
+							
+						}
+						>div{
+							float: left;
+							p{
+								font-size: .8rem;
 							}
 						}
 					}

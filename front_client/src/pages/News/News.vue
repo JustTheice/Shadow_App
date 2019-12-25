@@ -4,7 +4,7 @@
 		<nav id="news-nav" ref="navTop">
 			<ul>
 				<li class="active">
-					<a href="#">IT综合</a>
+					<a href="javcript:;">IT综合</a>
 				</li>
 				<li>
 					<a href="#">游戏竞技</a>
@@ -23,7 +23,7 @@
 		<section id="container">
 			<ul>
 				<li>
-					<a href="javascript:;">
+					<a href="http://baidu.com" target="_blank">
 						<div class="left">
 							<img src="" alt="暂无"/>
 						</div>
@@ -92,8 +92,12 @@
 					&.active{
 						border-radius: .2rem;
 						background: limegreen;
+						a{
+							color: whitesmoke;
+						}
 					}
 					a{
+						
 						display: block;
 						height: 100%;
 						line-height: 1.3rem;
