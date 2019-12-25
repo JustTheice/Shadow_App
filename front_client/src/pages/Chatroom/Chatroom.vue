@@ -12,11 +12,18 @@
 		<div class="chatbox">
 			<div class="content">
 				<ul>
-					<li>
+					<li class="others">
 						<span class="iconfont icon-avatar"></span>
 						<div>
-							<p class="title">我</p>
-							<p>内容</p>
+							<p class="name">其他人说：</p>
+							<p class="msg">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
+						</div>
+					</li>
+					<li class="self">
+						<span class="iconfont icon-avatar"></span>
+						<div>
+							<p class="name">我说：</p>
+							<p class="msg">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
 						</div>
 					</li>
 				</ul>
@@ -37,10 +44,18 @@
 			HeaderTop,
 		},
 		mounted() {
-			let scale = document.documentElement.clientWidth/16;
-			let chatWrap = this.$refs.chatroom;
-			chatWrap.style.height = (document.documentElement.clientHeight-document.querySelector('#nav').offsetHeight) + 'px';
-			chatWrap.querySelector('.content').style.height = (chatWrap.offsetHeight - chatWrap.querySelector('header').offsetHeight - chatWrap.querySelector('.recreations').offsetHeight-2*scale) + 'px';
+			this.initH();
+			window.onresize = () => {
+				this.initH();
+			}
+		},
+		methods: {
+			initH(){ //动态设置高度
+				let scale = document.documentElement.clientWidth/16;
+				let chatWrap = this.$refs.chatroom;
+				chatWrap.style.height = (document.documentElement.clientHeight-document.querySelector('#nav').offsetHeight) + 'px';
+				chatWrap.querySelector('.content').style.height = (chatWrap.offsetHeight - chatWrap.querySelector('header').offsetHeight - chatWrap.querySelector('.recreations').offsetHeight-2*scale) + 'px';
+			}
 		}
 	}
 </script>
@@ -85,15 +100,75 @@
 				.oneLine(gray);
 				ul{
 					li{
+						.clearfix();
+						padding: .5rem;
 						>span{
-							float: left;
-							font-size: 2rem;
-							
-						}
+								font-size: 2rem;
+							}
 						>div{
-							float: left;
 							p{
 								font-size: .8rem;
+								&.name{
+									padding: .1rem 0;
+									font-size: .7rem;
+								}
+								&.msg{
+									clear: both;
+									margin-top: .2rem;
+									padding: .3rem;
+									border-radius: .2rem;
+									position: relative;
+									max-width: 8rem;
+									
+								}
+							}
+						}
+						&.others{
+							>span{
+								float: left;
+							}
+							>div{
+								float: left;
+								p{
+									&.name{
+										float: left;
+										margin-left: .5rem;
+									}
+									&.msg{
+										background: rgba(50,220,50,.8);
+										left: .5rem;
+										&::before{
+											position: absolute;
+											top: .3rem;
+											left: -.5rem;
+											.triangle(left, .5rem, rgba(50,220,50,.8));
+										}
+									}
+								}
+							}
+						}
+						&.self{
+							>span{
+									float: right;
+								}
+							>div{
+								float: right;
+								p{
+									&.name{
+										float: right;
+										margin-right: .5rem;
+									}
+									&.msg{
+										background: rgba(20,200,220,.8);
+										right: .5rem;
+										&::before{
+											position: absolute;
+											top: .3rem;
+											right: -.5rem;
+											.triangle(right, .5rem, rgba(20,200,220,.8));
+										}
+									}
+								}
 							}
 						}
 					}
@@ -104,6 +179,8 @@
 				height: 2rem;
 				line-height: 2rem;
 				padding: 0 .4rem;
+				position: absolute;
+				bottom: 0;
 				input[type=text]{
 					color: darkgray;
 					display: inline-block;
@@ -119,6 +196,7 @@
 				}
 				button{
 					display: inline-block;
+					width: 2.8rem;
 					height: 1.6rem;
 					vertical-align: 0.05rem;
 				}
