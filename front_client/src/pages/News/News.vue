@@ -22,27 +22,16 @@
 		</nav>
 		<section id="container">
 			<ul>
-				<li>
-					<a href="http://baidu.com" target="_blank">
+				<li v-for="(item, index) in news">
+					<router-link :to="'/topic?url'+item.url">
 						<div class="left">
-							<img src="" alt="暂无"/>
+							<img :src="item.picUrl" alt="暂无"/>
 						</div>
 						<div class="right">
-							<h4>新闻标题</h4>
-							<span class="time">2019-12-24 20:36</span>
+							<h4>{{item.title}}</h4>
+							<span class="time">{{item.ctime}}</span>
 						</div>
-					</a>
-				</li>
-				<li>
-					<a href="javascript:;">
-						<div class="left">
-							<img src="" alt="暂无"/>
-						</div>
-						<div class="right">
-							<h4>新闻标题</h4>
-							<span class="time">2019-12-24 20:36</span>
-						</div>
-					</a>
+					</router-link>
 				</li>
 			</ul>
 		</section>
@@ -57,13 +46,40 @@
 			HeaderTop,
 		},
 		mounted() {
+			//新闻导航滚动
 			let navTop = this.$refs.navTop;
-			// navTop.querySelector('ul').style.width = ;
 			let navScroll = new BScroll(navTop, {
 				scrollY: false,
 				scrollX: true,
 				click: true
 			});
+			
+			//获取新闻列表并添加滚动
+			let newsContainer = document.getElementById('container');
+			newsContainer.style.height = (document.documentElement.clientHeight-document.querySelector('#header-top').offsetHeight-document.querySelector('#news-nav').offsetHeight-document.querySelector('nav').offsetHeight)+'px';
+			let listScroll;
+			if(!this.$store.state.news['IT'].length){
+				this.$store.dispatch('getNews', {
+					type: 'IT',
+					cb: (type) => {
+						this.news = this.$store.state.news['IT'];
+						this.$nextTick(() => {
+							listScroll = new BScroll('#container', {
+								scrollX: false,
+								scrollY: true,
+								click: true
+							});
+						});
+					}
+				});
+			}else{
+				this.news = this.$store.state.news['IT'];
+			}
+		},
+		data(){
+			return {
+				news: []
+			}
 		}
 	}
 </script>
@@ -71,6 +87,7 @@
 <style lang="less">
 	#news{
 		overflow: hidden;
+		height: 100%;
 		#news-nav{
 			width: 100%;
 			height: 1.7rem;
@@ -108,6 +125,7 @@
 			}
 		}
 		#container{
+			overflow: hidden;
 			ul{
 				width: 100%;
 				margin: 0 auto;
@@ -140,8 +158,15 @@
 							float: right;
 							color: rgb(25,25,25);
 							h4{
-								font-size: 1rem;
+								font-size: .8rem;
+								line-height: 1rem;
 								margin-top: .2rem;
+								max-height: 3rem;
+								-webkit-line-clamp: 3;
+								display: -webkit-box;
+								-webkit-box-orient: vertical;
+								overflow: hidden;
+								text-overflow: ellipsis;
 							}
 							span{
 								font-size: .6rem;

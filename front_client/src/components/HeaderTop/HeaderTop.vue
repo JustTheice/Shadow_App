@@ -1,7 +1,8 @@
 <template>
-	<header>
-		<router-link class="iconfont icon-avatar" to="/profile" v-show="$route.path!='/profile'"></router-link>
+	<header id="header-top">
+		<slot name="left"></slot>
 		<h2>{{title}}</h2>
+		<router-link class="iconfont icon-avatar" to="/profile" v-show="$route.path!='/profile'"></router-link>
 	</header>
 </template>
 
@@ -16,6 +17,19 @@
 		width: 100%;
 		height: 2rem;
 		background: deepskyblue;
+		position: relative;
+		.left{
+			position: absolute;
+			display: block;
+			top: 0;
+			left: .2rem;
+			height: 1.6rem;
+			padding: .2rem;
+			line-height: 1.6rem;
+			background: deepskyblue;
+			color: whitesmoke;
+			font-size: 1rem!important;
+		}
 		h2{
 			text-align: center;
 			width: 50%;
@@ -32,7 +46,9 @@
 			height: 1.6rem;
 			padding: .2rem;
 			border-radius: 50%;
-			float: right;
+			position: absolute;
+			right: .2rem;
+			top: 0;
 		}
 	}
 </style>

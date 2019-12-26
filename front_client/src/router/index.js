@@ -5,6 +5,7 @@ const News = () => import('../pages/News/News.vue');
 const Chatroom = () => import('../pages/Chatroom/Chatroom.vue');
 const Tools = () => import('../pages/Tools/Tools.vue');
 const Profile = () => import('../pages/Profile/Profile.vue');
+const Topic = () => import('../pages/Topic/Topic.vue');
 
 Vue.use(Router)
 
@@ -16,19 +17,35 @@ export default new Router({
     },
 		{
 			path: '/news',
-			component: News
+			component: News,
+			meta: {
+				showFooter: true
+			}
 		},
 		{
 			path: '/chatroom',
-			component: Chatroom
+			component: Chatroom,
+			meta: {
+				showFooter: true
+			}
 		},
 		{
 			path: '/tools',
-			component: Tools
+			component: Tools,
+			meta: {
+				showFooter: true
+			}
 		},
 		{
 			path: '/profile',
-			component: Profile
+			component: Profile,
+			meta: {
+				showFooter: true
+			}
 		},
+		{
+			path: '/topic',
+			component: Topic
+		}
   ]
 })
