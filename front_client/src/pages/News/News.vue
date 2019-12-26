@@ -22,6 +22,8 @@
 		</nav>
 		<section id="container">
 			<ul>
+				<li class="more">
+				</li>
 				<li v-for="(item, index) in news">
 					<router-link :to="'/topic?url='+item.url">
 						<div class="left">
@@ -40,6 +42,7 @@
 
 <script>
 	import BScroll from 'better-scroll';
+	import { Indicator } from 'mint-ui';
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
 	export default{
 		components: {
@@ -69,8 +72,16 @@
 								scrollY: true,
 								click: true
 							});
-							listScroll.on('scroll', ({x,y}) => {
-								console.log(y)
+							//下拉重新获取
+							listScroll.on('touchEnd', ({x,y}) => {
+								if(y>document.querySelector('.more').offsetHeight*3/4){
+									this.getNews(this.getType(this.cIndex), () => {
+										this.$nextTick(() => {
+											Indicator.close();
+										})
+									});
+									Indicator.open('加载中...');
+								}
 							});
 						});
 					}
@@ -78,8 +89,6 @@
 			}else{
 				this.news = this.$store.state.news['IT'];
 			}
-		
-			
 		},
 		data(){
 			return {
@@ -88,8 +97,7 @@
 			}
 		},
 		methods: {
-			toggleGrade(index){ //切换新闻分类
-				this.cIndex = index;
+			getType(index){ //获取相应新闻类型
 				let type = '';
 				switch (index){
 					case 0:
@@ -108,13 +116,25 @@
 						type = "Internet"
 						break;
 				}
+				return type;
+			},
+			getNews(type, cb){ //更新新闻信息到vuex
+				//通知action执行
+				this.$store.dispatch('getNews', {
+					type,
+					cb
+				});
+			},
+			toggleGrade(index=this.cIndex){ //切换新闻分类
+				let type = this.getType(index);
 				if(!this.$store.state.news[type].length){
-					this.$store.dispatch('getNews', {
-						type,
-						cb: (type) => {
-							this.news = this.$store.state.news[type];
-						}
-					});
+					Indicator.open('加载中...');
+					this.getNews(type, (type) => {
+						this.news = this.$store.state.news[type];
+						this.$nextTick(() => {
+							Indicator.close();
+						});
+					})
 				}else{
 					this.news = this.$store.state.news[type];
 				}
@@ -166,9 +186,20 @@
 		}
 		#container{
 			overflow: hidden;
+			position: relative;
+			
 			ul{
 				width: 100%;
 				margin: 0 auto;
+				>.more{
+					position: absolute;
+					top: -5rem;
+					height: 5rem;
+					text-align: center;
+					background: url(img/more.gif) no-repeat;
+					background-size: 6rem 6rem;
+					background-position: 50% 50%;
+				}
 				li{
 					box-sizing: border-box;
 					width: 15.6rem;

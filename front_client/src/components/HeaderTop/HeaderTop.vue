@@ -2,7 +2,9 @@
 	<header id="header-top">
 		<slot name="left"></slot>
 		<h2>{{title}}</h2>
-		<router-link class="iconfont icon-avatar" to="/profile" v-show="$route.path!='/profile'"></router-link>
+		<router-link to="/profile" v-show="$route.path!='/profile'">
+			<img src="./img/avatar.png" alt="头像">
+		</router-link>
 	</header>
 </template>
 
@@ -49,6 +51,13 @@
 			position: absolute;
 			right: .2rem;
 			top: 0;
+			img{
+				width: 100%;
+				height: 100%;
+				display: block;
+				border-radius: 50%;
+				
+			}
 		}
 	}
 </style>

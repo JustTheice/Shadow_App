@@ -13,14 +13,14 @@
 			<div class="content">
 				<ul>
 					<li class="others">
-						<span class="iconfont icon-avatar"></span>
+						<img src="./img/avatar.png" alt="头像">
 						<div>
 							<p class="name">其他人说：</p>
 							<p class="msg">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
 						</div>
 					</li>
 					<li class="self">
-						<span class="iconfont icon-avatar"></span>
+						<img src="./img/avatar.png" alt="头像">
 						<div>
 							<p class="name">我说：</p>
 							<p class="msg">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
@@ -102,8 +102,10 @@
 					li{
 						.clearfix();
 						padding: .5rem;
-						>span{
+						>img{
 								font-size: 2rem;
+								width: 2rem;
+								height: 2rem;
 							}
 						>div{
 							p{
@@ -124,7 +126,7 @@
 							}
 						}
 						&.others{
-							>span{
+							>img{
 								float: left;
 							}
 							>div{
@@ -148,7 +150,7 @@
 							}
 						}
 						&.self{
-							>span{
+							>img{
 									float: right;
 								}
 							>div{
