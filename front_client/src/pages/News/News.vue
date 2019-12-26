@@ -3,27 +3,27 @@
 		<HeaderTop title="科技新闻"></HeaderTop>
 		<nav id="news-nav" ref="navTop">
 			<ul>
-				<li class="active">
+				<li :class="{active: cIndex===0}" @click="toggleGrade(0)">
 					<a href="javcript:;">IT综合</a>
 				</li>
-				<li>
-					<a href="#">游戏竞技</a>
+				<li :class="{active: cIndex===1}" @click="toggleGrade(1)">
+					<a href="javacript:;">游戏竞技</a>
 				</li>
-				<li>
-					<a href="#">影视</a>
+				<li :class="{active: cIndex===2}" @click="toggleGrade(2)">
+					<a href="javacript:;">影视资讯</a>
 				</li>
-				<li>
-					<a href="#">动漫快车</a>
+				<li :class="{active: cIndex===3}" @click="toggleGrade(3)">
+					<a href="javacript:;">动漫快车</a>
 				</li>
-				<li>
-					<a href="#">互联网</a>
+				<li :class="{active: cIndex===4}" @click="toggleGrade(4)">
+					<a href="javacript:;">互联网</a>
 				</li>
 			</ul>
 		</nav>
 		<section id="container">
 			<ul>
 				<li v-for="(item, index) in news">
-					<router-link :to="'/topic?url'+item.url">
+					<router-link :to="'/topic?url='+item.url">
 						<div class="left">
 							<img :src="item.picUrl" alt="暂无"/>
 						</div>
@@ -56,7 +56,7 @@
 			
 			//获取新闻列表并添加滚动
 			let newsContainer = document.getElementById('container');
-			newsContainer.style.height = (document.documentElement.clientHeight-document.querySelector('#header-top').offsetHeight-document.querySelector('#news-nav').offsetHeight-document.querySelector('nav').offsetHeight)+'px';
+			newsContainer.style.height = (document.documentElement.clientHeight-document.querySelector('#header-top').offsetHeight-document.querySelector('#news-nav').offsetHeight-document.querySelector('#nav').offsetHeight)+'px';
 			let listScroll;
 			if(!this.$store.state.news['IT'].length){
 				this.$store.dispatch('getNews', {
@@ -69,16 +69,56 @@
 								scrollY: true,
 								click: true
 							});
+							listScroll.on('scroll', ({x,y}) => {
+								console.log(y)
+							});
 						});
 					}
 				});
 			}else{
 				this.news = this.$store.state.news['IT'];
 			}
+		
+			
 		},
 		data(){
 			return {
-				news: []
+				news: [],
+				cIndex: 0
+			}
+		},
+		methods: {
+			toggleGrade(index){ //切换新闻分类
+				this.cIndex = index;
+				let type = '';
+				switch (index){
+					case 0:
+						type = 'IT';
+						break;
+					case 1:
+						type = 'Game';
+						break;
+					case 2:
+						type = 'Film';
+						break;
+					case 3:
+						type = 'Cartoon';
+						break;
+					case 4:
+						type = "Internet"
+						break;
+				}
+				if(!this.$store.state.news[type].length){
+					this.$store.dispatch('getNews', {
+						type,
+						cb: (type) => {
+							this.news = this.$store.state.news[type];
+						}
+					});
+				}else{
+					this.news = this.$store.state.news[type];
+				}
+				this.cIndex = index;
 			}
 		}
 	}

@@ -13,39 +13,45 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/news'
+      redirect: '/news',
+			
     },
 		{
 			path: '/news',
 			component: News,
 			meta: {
-				showFooter: true
+				showFooter: true,
+				keepAlive: true
 			}
 		},
 		{
 			path: '/chatroom',
 			component: Chatroom,
 			meta: {
-				showFooter: true
+				showFooter: true,
+				keepAlive: true
 			}
 		},
 		{
 			path: '/tools',
 			component: Tools,
 			meta: {
-				showFooter: true
+				showFooter: true,
+				keepAlive: true
 			}
 		},
 		{
 			path: '/profile',
 			component: Profile,
 			meta: {
-				showFooter: true
+				showFooter: true,
+				keepAlive: true
 			}
 		},
 		{
 			path: '/topic',
-			component: Topic
+			component: Topic,
+			keepAlive: false
 		}
   ]
 })
