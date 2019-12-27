@@ -1,0 +1,57 @@
+/**
+ * 		1物理像素线
+ */
+
+.oneLine(@color){
+	position: relative;
+	&::before{
+		display: block;
+		width: 100%;
+		height: 1px;
+		content: '';
+		position: absolute;
+		bottom: 0;
+		background: @color;
+		@media only screen and (-webkit-device-pixel-ratio: 2) {
+			transform: scaleY(.5);
+		}
+		@media only screen and (-webkit-device-pixel-ratio: 3) {
+			transform: scaleY(.333);
+		}
+	}
+}
+
+/**
+ * 		清除浮动影响
+ */
+.clearfix(){
+	&::after{
+		content:"";
+		clear:both;
+		display:block;
+		height:0;
+		overflow:hidden;
+		visibility:hidden;
+	}
+}
+
+/**
+ * 		等边三角形
+ */
+.triangle(@_,@w:10px,@c:black){
+	content: '';
+	display: block;
+	font-size: 0;
+	width: 0;
+	height: 0;
+}
+.triangle(left,@w:10px,@c:black){
+	border-right: @w solid @c;
+	border-top: @w/1.7 solid transparent;
+	border-bottom: @w/1.7 solid transparent; 
+}
+.triangle(right,@w:10px,@c:black){
+	border-left: @w solid @c;
+	border-top: @w/1.7 solid transparent;
+	border-bottom: @w/1.7 solid transparent;  
+}

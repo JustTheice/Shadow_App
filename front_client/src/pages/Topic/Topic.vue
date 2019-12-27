@@ -6,7 +6,7 @@
 		<div class="table">
 			<!-- <a href="http"></a> -->
 		</div>
-		<iframe scrolling="auto" :src="url" @load="loadInit"></iframe>
+		<iframe scrolling="auto" :src="url" @load="loadInit" sandbox="allow-forms"></iframe>
 	</section>
 </template>
 
