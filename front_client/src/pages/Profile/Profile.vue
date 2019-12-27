@@ -3,7 +3,7 @@
 		<HeaderTop title="个人信息"></HeaderTop>
 		<div id="info">
 			<div class="avatar">
-				<i class="iconfont icon-avatar"></i>
+				<img src="./img/avatar.png">
 			</div>
 			<div class="right">
 				<div class="not-login" v-show="false">
@@ -38,7 +38,13 @@
 	export default{
 		components: {
 			HeaderTop,
-		}
+		},
+		data(){
+			return {
+				
+			}
+		},
+		
 	}
 </script>
 
@@ -58,10 +64,12 @@
 				margin-left: 1rem;
 				text-align: center;
 				line-height: 3.83rem;
-				i{
+				img{
+					display: block;
 					position: relative;
-					font-size: 3.5rem;
-					color: yellow;
+					width: 100%;
+					height: 100%;
+					border-radius: 50%;
 					&&:before{
 						position: absolute;
 						bottom: .1rem;
@@ -90,10 +98,11 @@
 						.lv{
 							>span{
 								&:nth-child(1){
+									color: white;
 									width: 1.5rem;
 									height: .8rem;
 									line-height: .8rem;
-									font-size: .7rem;
+									font-size: .6rem;
 									display: inline-block;
 									background: orangered;
 									border-radius: 15%;
