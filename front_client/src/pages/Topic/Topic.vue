@@ -6,7 +6,7 @@
 		<div class="table">
 			<!-- <a href="http"></a> -->
 		</div>
-		<iframe scrolling="auto" :src="url" @load="loadInit" sandbox="allow-forms"></iframe>
+		<iframe scrolling="auto" :src="url" @load="loadInit"></iframe>
 	</section>
 </template>
 
@@ -22,6 +22,15 @@
 				url: this.$route.query.url
 			}
 		},
+		mounted() {
+		  if (window.history && window.history.pushState) {
+		    history.pushState(null, null, document.URL);
+		    window.addEventListener('popstate', this.backFn, false);//false阻止默认事件
+		  }
+		},
+		destroyed() {
+			window.removeEventListener('popstate', this.backFn, false);
+		},
 		methods: {
 			loadInit(ev){
 				// new BScroll(ev.target, {
@@ -29,6 +38,9 @@
 				// 	scrollY: true,
 				// 	click: true
 				// });
+			},
+			backFn(){
+				this.$router.back();
 			}
 		}
 	}

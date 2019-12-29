@@ -6,7 +6,7 @@ const Chatroom = () => import('../pages/Chatroom/Chatroom.vue');
 const Tools = () => import('../pages/Tools/Tools.vue');
 const Profile = () => import('../pages/Profile/Profile.vue');
 const Topic = () => import('../pages/Topic/Topic.vue');
-const Login = () => import('../pages/Login/Login.vue');
+// const Login = () => import('../pages/Login/Login.vue');
 
 Vue.use(Router)
 
@@ -53,15 +53,18 @@ export default new Router({
 			path: '/topic',
 			component: Topic,
 			meta: {
-				keepAlive: true
+				keepAlive: false,
+				showFooter: false
 			}
 		},
-		{
-			path: '/login',
-			components: Login,
-			meta: {
-				keepAlive: false
-			}
-		}
+		// {
+		// 	path: '/login',
+		// 	component: Login,
+		// 	meta: {
+		// 		keepAlive: false,
+		// 		showFooter: false,
+		// 		transition: 'right'
+		// 	}
+		// }
   ]
 })

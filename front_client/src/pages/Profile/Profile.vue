@@ -6,10 +6,10 @@
 				<img src="./img/avatar.png">
 			</div>
 			<div class="right">
-				<div class="not-login" v-show="false">
+				<div class="not-login" v-show="true" @click="shows.login=true">
 					<p>登陆/注册&gt;&gt;</p>
 				</div>
-				<div class="logined">
+				<div class="logined" v-show="false" @click="shows.userInfo=true">
 					<div class="lv">
 						<span>LV1</span>
 						<span>弟中弟</span>
@@ -22,34 +22,69 @@
 			</div>
 		</div>
 		<div id="cells">
-			<mt-cell title="我的积分" is-link>
+			<mt-cell title="我的积分" is-link @click.native="shows.score=true">
 			  <span slot="icon" class="iconfont icon-score"></span>
 			</mt-cell>
-			<mt-cell title="设置" is-link>
+			<mt-cell title="设置" is-link to="javascript:;" @click.native="shows.setting=true">
 			  <span slot="icon" class="iconfont icon-setting"></span>
 			</mt-cell>
 		</div>
+		<Login :style="{transform: shows.login?'translateX(0)':'translateX(100%)'}" :shows="shows"></Login>
+		<Setting :style="{transform: shows.setting?'translateX(0)':'translateX(100%)'}" :shows="shows"></Setting>
+		<UserInfo :style="{transform: shows.userInfo?'translateX(0)':'translateX(100%)'}" :shows="shows"></UserInfo>
+		<Score :style="{transform: shows.score?'translateX(0)':'translateX(100%)'}" :shows="shows"></Score>
 	</section>
 </template>
 
 <script>
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
+	import Login from '../../components/Login/Login.vue';
+	import Setting from '../../components/Setting/Setting.vue';
+	import UserInfo from '../../components/UserInfo/UserInfo.vue';
+	import Score from '../../components/Score/Score.vue';
 	import { Cell } from 'mint-ui';
 	export default{
 		components: {
-			HeaderTop,
+			HeaderTop, Login, Setting, UserInfo, Score
 		},
 		data(){
 			return {
-				
+				shows: {
+					login: false,
+					setting: false,
+					userInfo: false,
+					score: false
+				}
 			}
 		},
-		
+		mounted() {
+			if (window.history && window.history.pushState) {
+		    history.pushState(null, null, document.URL);
+		    window.addEventListener('popstate', this.backFn, false);//false阻止默认事件
+		  }
+		},
+		methods: {
+			backFn(){
+				for (let key in this.shows) {
+					if(this.shows.key===true){
+						this.shows.key = false;
+					}
+				}
+			}
+		},
+		destroyed() {
+			window.removeEventListener('popstate', this.backFn, false);
+		}
 	}
 </script>
 
 <style lang="less">
+	@import '../../../static/css/mixin.less';
 	#profile{
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
+		position: relative;
 		#info{
 			width: 16rem;
 			height: 5.83rem;
@@ -130,6 +165,9 @@
 						}
 					}
 				}
+			}
+			.showPage{
+				transform: translateX(0)!important;
 			}
 		}
 	}

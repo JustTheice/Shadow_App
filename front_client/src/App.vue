@@ -25,5 +25,6 @@
 <style lang="less">
 	#app{
 		height: 100%;
+		overflow: hidden;
 	}
 </style>

@@ -16,14 +16,14 @@
 						<img src="./img/avatar.png" alt="头像">
 						<div>
 							<p class="name">其他人说：</p>
-							<p class="msg">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
+							<p class="msg adjust">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
 						</div>
 					</li>
 					<li class="self">
 						<img src="./img/avatar.png" alt="头像">
 						<div>
 							<p class="name">我说：</p>
-							<p class="msg">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
+							<p class="msg adjust">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
 						</div>
 					</li>
 				</ul>

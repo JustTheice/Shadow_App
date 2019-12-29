@@ -2,9 +2,22 @@ const express = require('express');
 const proxyMiddleWare = require("http-proxy-middleware");
 const app = express();
 const helmet = require('helmet');
+const loginRouter = require('./router/login.js');
+const session = require('express-session');
+const bodyParser = require('body-parser');
+
+//配置session模块
+app.use(session({
+  secret: 'myblog',
+  resave: false,
+  saveUninitialized: false
+}));
+//配置body-parser模块来方便获取post请求的表单内容
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 
 
-
+app.use(loginRouter);
 
 //数据代理
 let proxys = {
