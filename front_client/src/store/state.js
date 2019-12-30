@@ -5,5 +5,8 @@ export default {
 		Film: [],
 		Cartoon: [],
 		Internet: []
+	},
+	userInfo: {
+		
 	}
 }

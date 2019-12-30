@@ -1,4 +1,5 @@
-import apis from '../api/';
+import apis from '../api/news.js';
+import {reqLogin} from '../api/server.js';
 export default {
 	async getNews({commit,state}, {type,cb}){
 		let fn = 'req'+type+'News';
@@ -13,5 +14,9 @@ export default {
 			commit('UPDATE_NEWS', {type,news: ret.newslist});
 		}
 		cb && cb(type);
+	},
+	async login({commit}, {type, data}){
+		console.log(type, data)
+		let ret = await reqLogin(type, data);
 	}
 }

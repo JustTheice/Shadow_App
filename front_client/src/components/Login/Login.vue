@@ -11,23 +11,26 @@
 			<div class="pwd" v-show="type=='pwd'">
 				<mt-field label="用户名" placeholder="昵称/手机号" v-model="pwdData.name"></mt-field>
 				<mt-field label="密码" placeholder="密码" type="password" v-model="pwdData.pwd"></mt-field>
-				<mt-field label="验证码" placeholder="不分大小写" type="text" v-model="pwdData.pwd">
-					<img src="http://localhost:5000/getImgCode" alt="验证码" class="img-code">
+				<mt-field label="验证码" placeholder="不分大小写" type="text" v-model="pwdData.imgCode">
+					<img :src="imgCodeSrc" alt="验证码" class="img-code" @click="getImgCode"/>
 				</mt-field>
-				<mt-button type="primary" size="large">注册/登录</mt-button>
+				<mt-button type="primary" size="large" @click="login()">注册/登录</mt-button>
 			</div>
 			<div class="phone" v-show="type=='phone'">
 				<mt-field label="手机号" placeholder="仅支持中国大陆" type="tel" v-model="phoneData.phone">
-					<mt-button type="primary" size="small">获取</mt-button>
+					<mt-button type="primary" size="small" @click.native="getPhoneCode" v-show="!codeCount">获取</mt-button>
+					<span v-show="codeCount">{{codeCount}}s</span>
 				</mt-field>
 				<mt-field label="验证码" placeholder="短信验证码" type="password" v-model="pwdData.phoneCode"></mt-field>
-				<mt-button type="primary" size="large">注册/登录</mt-button>
+				<mt-button type="primary" size="large" @click="login()">注册/登录</mt-button>
 			</div>
 		</div>
 	</section>
 </template>
 
 <script>
+	import { MessageBox } from 'mint-ui';
+	import {reqPhoneCode} from '../../api/server.js';
 	export default {
 		props: ['shows'],
 		mounted() {
@@ -45,7 +48,55 @@
 					phone: '',
 					imgCode: '',
 					phoneCode: ''
+				},
+				imgCodeSrc: 'http://127.0.0.1:5000/getImgCode?'+Date.now(),
+				codeCount: 0
+			}
+		},
+		methods: {
+			login(){
+				let {type, pwdData, phoneData} = this;
+				if(type=='pwd'){ //密码登录，前端检查用户名、密码、验证码位数是否正确
+					let {name, pwd, imgCode} = pwdData;
+					if(!name){
+						return MessageBox('格式错误', '用户名不能为空');
+					}
+					if(!pwd){
+						return MessageBox('格式错误', '密码不能为空');
+					}
+					if(imgCode.length!=4){
+						return MessageBox('格式错误', '图片验证码只能是4位');
+					}
+					this.$store.dispatch('login', {type, data:{name, pwd, imgCode}});
+				}else if(type="phone"){
+					let {phone, phoneCode} = phoneData;
+					if(!/^1\d{10}$/.test(phone)){
+						return MessageBox('格式错误', '手机号格式错误且仅支持中国大陆号');
+					}
+					if(phoneCode.length!=6){
+						return MessageBox('格式错误', '短信验证码只能是6位');
+					}
+					this.$store.dispatch('login', {type, data:{phone, phoneCode}});
 				}
+			},
+			getImgCode(){ //重新加载图形验证码
+				this.imgCodeSrc = 'http://127.0.0.1:5000/getImgCode?'+Date.now();
+			},
+			getPhoneCode(){ //获取手机验证码
+				if(!/^1\d{10}$/.test(this.phoneData.phone)){
+					return MessageBox('格式错误', '手机号格式错误且仅支持中国大陆号');
+				}
+				reqPhoneCode(this.phoneData.phone).then(
+					(ret) => {},
+					(err) => {}
+				);
+				this.codeCount = 30;
+				let phoneTimer = setInterval(() => {
+					this.codeCount--;
+					if(this.codeCount===0){
+						clearInterval(phoneTimer);
+					}
+				}, 1000);
 			}
 		}
 	}

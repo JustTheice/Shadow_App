@@ -5,6 +5,9 @@ const helmet = require('helmet');
 const loginRouter = require('./router/login.js');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const db = require('./db/index.js');
+const User = require('./db/users.js');
+
 
 //配置session模块
 app.use(session({
