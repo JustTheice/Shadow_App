@@ -21,8 +21,8 @@
 					<mt-button type="primary" size="small" @click.native="getPhoneCode" v-show="!codeCount">获取</mt-button>
 					<span v-show="codeCount">{{codeCount}}s</span>
 				</mt-field>
-				<mt-field label="验证码" placeholder="短信验证码" type="password" v-model="pwdData.phoneCode"></mt-field>
-				<mt-button type="primary" size="large" @click="login()">注册/登录</mt-button>
+				<mt-field label="验证码" placeholder="短信验证码" type="password" v-model="phoneData.phoneCode"></mt-field>
+				<mt-button type="primary" size="large" @click="login">注册/登录</mt-button>
 			</div>
 		</div>
 	</section>
@@ -30,11 +30,22 @@
 
 <script>
 	import { MessageBox } from 'mint-ui';
-	import {reqPhoneCode} from '../../api/server.js';
+	import {reqPhoneCode, reqLogin, autoLogin} from '../../api/server.js';
 	export default {
 		props: ['shows'],
 		mounted() {
-			
+			autoLogin().then(
+				(ret) => {
+					if(ret.code===0){
+						this.$store.dispatch('saveUser', {userInfo: ret.data});
+					}
+				},
+				(err) => {
+					console.log('自动登陆失败'+err)
+				}
+			)
+		},
+		computed: {
 		},
 		data(){
 			return {
@@ -49,13 +60,14 @@
 					imgCode: '',
 					phoneCode: ''
 				},
-				imgCodeSrc: 'http://127.0.0.1:5000/getImgCode?'+Date.now(),
+				imgCodeSrc: 'http://192.168.2.104:5000/getImgCode?'+Date.now(),
 				codeCount: 0
 			}
 		},
 		methods: {
-			login(){
+			login(){ //注册/登录
 				let {type, pwdData, phoneData} = this;
+				let sendData;
 				if(type=='pwd'){ //密码登录，前端检查用户名、密码、验证码位数是否正确
 					let {name, pwd, imgCode} = pwdData;
 					if(!name){
@@ -67,7 +79,7 @@
 					if(imgCode.length!=4){
 						return MessageBox('格式错误', '图片验证码只能是4位');
 					}
-					this.$store.dispatch('login', {type, data:{name, pwd, imgCode}});
+					sendData = {type:'pwd', data: {name,pwd,imgCode}};
 				}else if(type="phone"){
 					let {phone, phoneCode} = phoneData;
 					if(!/^1\d{10}$/.test(phone)){
@@ -76,12 +88,29 @@
 					if(phoneCode.length!=6){
 						return MessageBox('格式错误', '短信验证码只能是6位');
 					}
-					this.$store.dispatch('login', {type, data:{phone, phoneCode}});
+					sendData = {type:'phone', data: {phone,phoneCode}};
 				}
+				//发送请求
+				reqLogin(sendData).then(
+					(ret) => {
+						if(ret.code===0){
+							this.$store.dispatch('saveUser', {userInfo: ret.data});
+							MessageBox('验证消息', '登录成功');
+							this.shows.login = false;
+						}else if(ret.code===1 || ret.code===2){
+							MessageBox('验证消息', ret.msg);
+						}
+					},
+					(err) => {
+						console.log(err);
+					}
+				)
 			},
+			
 			getImgCode(){ //重新加载图形验证码
-				this.imgCodeSrc = 'http://127.0.0.1:5000/getImgCode?'+Date.now();
+				this.imgCodeSrc = 'http://192.168.2.104:5000/getImgCode?'+Date.now();
 			},
+			
 			getPhoneCode(){ //获取手机验证码
 				if(!/^1\d{10}$/.test(this.phoneData.phone)){
 					return MessageBox('格式错误', '手机号格式错误且仅支持中国大陆号');
@@ -97,7 +126,8 @@
 						clearInterval(phoneTimer);
 					}
 				}, 1000);
-			}
+			},
+		
 		}
 	}
 </script>

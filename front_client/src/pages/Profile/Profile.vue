@@ -6,16 +6,16 @@
 				<img src="./img/avatar.png">
 			</div>
 			<div class="right">
-				<div class="not-login" v-show="true" @click="shows.login=true">
+				<div class="not-login" v-show="!userInfo._id" @click="shows.login=true">
 					<p>登陆/注册&gt;&gt;</p>
 				</div>
-				<div class="logined" v-show="false" @click="shows.userInfo=true">
+				<div class="logined" v-show="userInfo._id" @click="shows.userInfo=true">
 					<div class="lv">
-						<span>LV1</span>
+						<span>LV{{userInfo.lv}}</span>
 						<span>弟中弟</span>
 					</div>
 					<p class="name">
-						<strong>昵称</strong>
+						<strong>{{userInfo.name}}</strong>
 					</p>
 					<p>今日未签到</p>
 				</div>
@@ -42,6 +42,7 @@
 	import Setting from '../../components/Setting/Setting.vue';
 	import UserInfo from '../../components/UserInfo/UserInfo.vue';
 	import Score from '../../components/Score/Score.vue';
+	import {mapState} from 'vuex';
 	import { Cell } from 'mint-ui';
 	export default{
 		components: {
@@ -56,6 +57,9 @@
 					score: false
 				}
 			}
+		},
+		computed: {
+			...mapState(['userInfo']),
 		},
 		mounted() {
 			if (window.history && window.history.pushState) {

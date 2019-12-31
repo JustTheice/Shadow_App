@@ -15,8 +15,7 @@ export default {
 		}
 		cb && cb(type);
 	},
-	async login({commit}, {type, data}){
-		console.log(type, data)
-		let ret = await reqLogin(type, data);
+	saveUser({commit}, {userInfo}){
+		commit('UPDATE_USERINFO', {userInfo})
 	}
 }
