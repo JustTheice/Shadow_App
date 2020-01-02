@@ -7,6 +7,8 @@ const loginRouter = require('./router/login.js');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
+const http = require('http').createServer(app); 
+const io = require('socket.io')('http');
 
 app.all('*', function (req, res, next) {
   res.header('Access-Control-Allow-Origin', 'http://192.168.2.104');
@@ -45,7 +47,7 @@ let proxys = {
 	}
 }
 app.use('/film', proxyMiddleWare(proxys)); 
-app.use('/public/',express.static(path.join(__dirname,'./public/')));
+app.use('/static/',express.static(path.join(__dirname,'./static/')));
 app.get('/', (req, res, next) => {
 	res.type('html');
 	res.sendFile(path.join(__dirname,'./view/index.html'));
@@ -57,6 +59,16 @@ app.get('/', (req, res, next) => {
 app.use(helmet({
   frameguard: true  // 允许iframe
 }));
+
+
+
+//socket服务
+io.on('connection', function(socket){
+	console.log('一个用户连接到了socket');
+	socket.on('chat message', function(msg){
+		io.emit('chat message', msg);
+	});
+})
 
 app.listen(5000, () => {
 	console.log('server is running...');

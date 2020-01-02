@@ -40,6 +40,7 @@
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
 	import {mapState} from 'vuex';
 	import { Button } from 'mint-ui';
+	import io from 'socket.io';
 	export default{
 		components: {
 			HeaderTop,
@@ -49,6 +50,9 @@
 			window.onresize = () => {
 				this.initH();
 			}
+			
+			//连接聊天服务器
+			let socket = io();
 		},
 		computed: {
 			...mapState(['settings'])
