@@ -16,6 +16,10 @@ export default {
 		cb && cb(type);
 	},
 	saveUser({commit}, {userInfo}){
-		commit('UPDATE_USERINFO', {userInfo})
+		commit('UPDATE_USERINFO', {userInfo});
+	},
+	updateSize({commit}, {newV}){
+		newV *= 0.4;
+		commit('UPDATE_SIZE', {newV})
 	}
 }

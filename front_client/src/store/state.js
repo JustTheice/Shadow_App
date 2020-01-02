@@ -8,5 +8,8 @@ export default {
 	},
 	userInfo: {
 		
+	},
+	settings: {
+		adjustSize: 0.8
 	}
 }

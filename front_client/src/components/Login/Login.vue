@@ -99,6 +99,9 @@
 							this.shows.login = false;
 						}else if(ret.code===1 || ret.code===2){
 							MessageBox('验证消息', ret.msg);
+							if(ret.code===1){
+								this.getImgCode();
+							}
 						}
 					},
 					(err) => {

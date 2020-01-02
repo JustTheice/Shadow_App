@@ -6,7 +6,7 @@
 			<h2>积分</h2>
 		</div>
 		<div class="mid" ref="mid">
-			<p>当前积分：0</p>
+			<p>{{$store.state.userInfo._id ? '当前积分：'+$store.state.userInfo.integral : '请先登录'}}</p>
 		</div>
 		<div class="content" ref="content">
 			<div class="type" ref="type">
@@ -15,17 +15,11 @@
 			</div>
 			<div class="rank" ref="rank" v-show="type===0">
 				<ul>
-					<li>
-						<span class="rank-place">1</span>
+					<li v-for="(rank,index) in ranks" :key="index">
+						<span class="rank-place">{{index+1}}</span>
 						<img src="./img/avatar.png" alt="头像">
-						<span class="rank-name">艾克</span>
-						<span class="rank-score">200</span>
-					</li>
-					<li>
-						<span class="rank-place">2</span>
-						<img src="./img/avatar.png" alt="头像">
-						<span class="rank-name">阿卡丽</span>
-						<span class="rank-score">200</span>
+						<span class="rank-name">{{rank.name}}</span>
+						<span class="rank-score">{{rank.integral}}</span>
 					</li>
 				</ul>
 			</div>
@@ -49,16 +43,28 @@
 </template>
 
 <script>
+	import {getRank} from '../../api/server.js'
 	export default {
 		props: ['shows'],
 		mounted() {
 			this.$refs.content.style.height = (this.$refs.score.offsetHeight-this.$refs.top.offsetHeight-this.$refs.mid.offsetHeight)+'px'
 			this.$refs.rank.style.height = (this.$refs.content.clientHeight-this.$refs.type.offsetHeight)+'px';
 			this.$refs.prize.style.height = (this.$refs.content.clientHeight-this.$refs.type.offsetHeight)+'px';
+			
+			//获取最高分
+			getRank().then(
+				(ret) => {
+					this.ranks = ret;
+				},
+				(err) => {
+					console.log(err);
+				}
+			);
 		},
 		data(){
 			return {
 				type: 0,
+				ranks: []
 			}
 		}
 	}

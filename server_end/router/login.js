@@ -19,6 +19,7 @@ function getImgCode (req, res) {
     }
     var captcha = svgCaptcha.create(codeConfig);
     req.session.captcha = captcha.text.toLowerCase(); //存session用于验证接口获取文字码
+		console.log(req.session);
 		res.type('svg');
     res.send(captcha.data);
 }
@@ -91,13 +92,13 @@ router.post('/login', (req, res, next) => {
 		}else{ //找到用户了则登录, 如果是密码登录则需要判断密码
 			if(logType == 'pwd'){
 				User.findOne({name: data.name, pwd: data.pwd}, (err, ret) => {
-					req.session.userId = ret._id;
 					if(!ret){ //密码不匹配
 						return res.send(JSON.stringify({
 							code: 2,
 							msg: '用户名已存在但密码不匹配'
 						}));
 					}else{
+						req.session.userId = ret._id;
 						return res.send(JSON.stringify({
 							code: 0,
 							data: ret,
@@ -139,6 +140,89 @@ router.get('/autoLogin', (req, res, next) => {
 			}))
 		}
 	});
+});
+
+
+//更改信息
+router.post('/updateInfo', (req, res, next) => {
+	let data = req.body;
+	User.findByIdAndUpdate(data._id, data, (err, ret) => {
+		if(err){
+			return console.log('修改失败'+err);
+		}
+		if(ret){
+			res.send(JSON.stringify({
+				code: 0,
+				msg: '修改成功',
+				data: ret
+			}));
+		}
+	});
+	
+});
+
+//更改密码
+router.post('/updatePwd', (req, res, next) => {
+	let pwds = req.body;
+	User.findOne({_id:req.session.userId, pwd: md5(md5(pwds.oldPwd))}, (err,ret) => {
+		if(err){
+			return console.log('查找出错'+err);
+		}
+		if(ret){
+			User.findByIdAndUpdate(req.session.userId, {pwd: md5(md5(pwds.newPwd))}, (err,ret) => {
+				if(err){
+					return console.log('修改时出错');
+				}
+				if(ret){
+					res.send(JSON.stringify({
+						code: 0,
+						msg: '修改成功'
+					}));
+				}
+			});
+		}else{
+			res.send(JSON.stringify({
+				code: 1,
+				msg: '原密码错误'
+			}));
+		}
+	})
+});
+
+//获取积分榜
+router.get('/getRank', (req, res, next) => {
+	User.find({}, (err,ret) => {
+		if(err){
+			return console.log('查找失败'+err);
+		}
+		let users = ret;
+		for(let i=0; i<users.length-1; i++){
+			for(let j=0; j<users.length-1-i; j++){
+				if(users[i].integral < users[i+1].integral){
+					let t = users[i];
+					users[i] = users[i+1];
+					users[i+1] = t;
+				}
+			}
+		}
+		res.send(JSON.stringify(users.slice(0,5)));
+	});
+});
+
+
+
+//删除用户
+router.get('/signout', (req, res, next) => {
+	User.findByIdAndRemove(req.session.userId, (err, ret) => {
+		if(err){
+			return console.log('删除失败'+err);
+		}
+		res.send(JSON.stringify({
+			code: 0,
+			msg: '注销成功',
+			data: ret
+		}));
+	})
 });
 
 // 发送验证码(容联云)

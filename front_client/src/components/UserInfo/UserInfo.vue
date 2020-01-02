@@ -6,28 +6,42 @@
 			<h2>个人信息</h2>
 		</div>
 		<form action="/">
-			<mt-field label="昵称" placeholder="请输入用户名" v-model="info.username"></mt-field>
-			<mt-field label="爱好" v-model="info.hobbies"></mt-field>
-			<mt-field label="生日" placeholder="请输入生日" type="date" v-model="info.birthday"></mt-field>
-			<mt-field label="自我介绍" type="textarea" rows="4" v-model="info.introduction"></mt-field>
-			<input type="hidden" v-model="info.status">
-			<mt-button type="default" size="large">确认修改</mt-button>
+			<mt-field label="昵称" placeholder="请输入用户名" v-model="userInfo.name"></mt-field>
+			<mt-field label="爱好" v-model="userInfo.hobbies"></mt-field>
+			<mt-field label="生日" placeholder="请输入生日" type="date" v-model="userInfo.birthday"></mt-field>
+			<mt-field label="自我介绍" type="textarea" rows="4" v-model="userInfo.introduction"></mt-field>
+			<input type="hidden" v-model="userInfo._id">
+			<mt-button type="default" size="large" @click.prevent="sendChange">确认修改</mt-button>
 		</form>
 	</section>
 </template>
 
 <script>
+	import {mapState} from 'vuex';
+	import { MessageBox } from 'mint-ui';
+	import {updateInfo} from '../../api/server.js'
 	export default {
 		props: ['shows'],
 		data(){
 			return {
-				info: {
-					username: '',
-					hobbies: '',
-					status: 0,
-					birthday: '',
-					introduction: ''
-				}
+				
+			}
+		},
+		computed: {
+			...mapState(['userInfo']),
+		},
+		methods: {
+			sendChange(){
+				updateInfo(this.userInfo).then(
+					(ret) => {
+						MessageBox('', '修改成功');
+						this.shows.userInfo = false;
+					},
+					(err) => {
+						MessageBox('', '修改失败，请稍后再试');
+						console.log('发送失败'+err)
+					}
+				)
 			}
 		}
 	}

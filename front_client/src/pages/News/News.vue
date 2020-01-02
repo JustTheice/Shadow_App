@@ -27,7 +27,7 @@
 				<li v-for="(item, index) in news">
 					<router-link :to="'/topic?url='+item.url">
 						<div class="left">
-							<img :src="item.picUrl" alt="暂无"/>
+							<img v-lazy="item.picUrl" alt="暂无"/>
 						</div>
 						<div class="right">
 							<h4>{{item.title}}</h4>
@@ -219,7 +219,6 @@
 								display: inline-block;
 								width: 100%;
 								height: 100%;
-								background: blue;
 							}
 						}
 						.right{

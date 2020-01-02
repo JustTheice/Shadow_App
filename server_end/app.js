@@ -6,9 +6,10 @@ const db = require('./db/index.js');
 const loginRouter = require('./router/login.js');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 app.all('*', function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+  res.header('Access-Control-Allow-Origin', 'http://192.168.2.104');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', '*');
   res.header('Content-Type', 'application/json;charset=utf-8');
@@ -28,6 +29,10 @@ app.use(session({
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+// //指定模板引擎
+// app.set("view engine", 'ejs');
+// //指定模板位置
+// app.set('views', path.join(__dirname,'./view/index.html'));
 
 app.use(loginRouter);
 
@@ -40,14 +45,18 @@ let proxys = {
 	}
 }
 app.use('/film', proxyMiddleWare(proxys)); 
-app.use(express.static('./'))
+app.use('/public/',express.static(path.join(__dirname,'./public/')));
+app.get('/', (req, res, next) => {
+	res.type('html');
+	res.sendFile(path.join(__dirname,'./view/index.html'));
+});
 
 
 //设置允许跨域访问该服务.
 
-// app.use(helmet({
-//   frameguard: false  // 允许iframe
-// }));
+app.use(helmet({
+  frameguard: true  // 允许iframe
+}));
 
 app.listen(5000, () => {
 	console.log('server is running...');

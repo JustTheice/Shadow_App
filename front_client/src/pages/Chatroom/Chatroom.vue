@@ -16,14 +16,14 @@
 						<img src="./img/avatar.png" alt="头像">
 						<div>
 							<p class="name">其他人说：</p>
-							<p class="msg adjust">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
+							<p class="msg adjust" :style="{'font-size': settings.adjustSize+'rem'}">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
 						</div>
 					</li>
 					<li class="self">
 						<img src="./img/avatar.png" alt="头像">
 						<div>
 							<p class="name">我说：</p>
-							<p class="msg adjust">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
+							<p class="msg adjust" :style="{'font-size': settings.adjustSize+'rem'}">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
 						</div>
 					</li>
 				</ul>
@@ -38,6 +38,7 @@
 
 <script>
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
+	import {mapState} from 'vuex';
 	import { Button } from 'mint-ui';
 	export default{
 		components: {
@@ -48,6 +49,9 @@
 			window.onresize = () => {
 				this.initH();
 			}
+		},
+		computed: {
+			...mapState(['settings'])
 		},
 		methods: {
 			initH(){ //动态设置高度

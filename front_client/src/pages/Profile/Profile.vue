@@ -30,7 +30,7 @@
 			</mt-cell>
 		</div>
 		<Login :style="{transform: shows.login?'translateX(0)':'translateX(100%)'}" :shows="shows"></Login>
-		<Setting :style="{transform: shows.setting?'translateX(0)':'translateX(100%)'}" :shows="shows"></Setting>
+		<Setting :style="{transform: shows.setting?'translateX(0)':'translateX(100%)'}" :shows="shows" :userId="userInfo._id"></Setting>
 		<UserInfo :style="{transform: shows.userInfo?'translateX(0)':'translateX(100%)'}" :shows="shows"></UserInfo>
 		<Score :style="{transform: shows.score?'translateX(0)':'translateX(100%)'}" :shows="shows"></Score>
 	</section>

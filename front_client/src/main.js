@@ -6,10 +6,16 @@ import router from './router'
 import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
 import store from './store/';
+import VueLazyload from 'vue-lazyload';
 
 Vue.use(MintUI)
 
 Vue.config.productionTip = true;
+
+//图片懒加载
+Vue.use(VueLazyload, {
+	loading: '../static/img/loading.gif',
+});
 
 /* eslint-disable no-new */
 new Vue({

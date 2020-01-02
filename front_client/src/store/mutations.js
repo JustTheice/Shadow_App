@@ -4,5 +4,8 @@ export default {
 	},
 	UPDATE_USERINFO(state, {userInfo}){
 		state.userInfo = userInfo;
+	},
+	UPDATE_SIZE(state, {newV}){
+		state.settings.adjustSize = newV;
 	}
 }
