@@ -1,12 +1,12 @@
 <template>
 	<section ref="topic" id="topic">
 		<HeaderTop title="新闻页">
-			<a href="javacript:;" slot="left" class="iconfont icon-back left" @touchstart="$router.back()"></a>
+			<a href="javacript:;" slot="left" class="iconfont icon-back left" @touchstart="shows.topic=false"></a>
 		</HeaderTop>
 		<div class="table">
 			<!-- <a href="http"></a> -->
 		</div>
-		<iframe scrolling="auto" :src="url" @load="loadInit"></iframe>
+		<iframe scrolling="auto" :src="url" @load="loadInit" ref="iframe"></iframe>
 	</section>
 </template>
 
@@ -14,25 +14,23 @@
 	import BScroll from 'better-scroll';
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
 	export default {
+		props: ['shows', 'url'],
 		components:{
 			HeaderTop
 		},
 		data(){
 			return {
-				url: this.$route.query.url
+				
 			}
 		},
 		mounted() {
-		  if (window.history && window.history.pushState) {
-		    history.pushState(null, null, document.URL);
-		    window.addEventListener('popstate', this.backFn, false);//false阻止默认事件
-		  }
-			setTimeout(() => {
-				this.$refs.topic.style.transform = 'translateX(0)';
-			})
+		//   if (window.history && window.history.pushState) {
+		//     history.pushState(null, null, document.URL);
+		//     window.addEventListener('popstate', this.backFn, false);//false阻止默认事件
+		//   }
 		},
 		destroyed() {
-			this.$refs.topic.style.transform = 'translateX(100%)';
+			// window.removeEventListener('popstate', this.backFn, false);
 		},
 		methods: {
 			loadInit(ev){
@@ -42,24 +40,25 @@
 				// 	click: true
 				// });
 			},
-			backFn(){
-				this.$router.back();
-			}
+			// backFn(){
+			// 	this.$router.back();
+			// }
 		}
 	}
 </script>
 
 <style lang="less">
 	#topic{
-		overflow: hidden;
-		height: 100%;
-		width: 100%;
-		background: white;
 		position: absolute;
+		z-index: 30;
 		top: 0;
 		left: 0;
 		transition: .3s;
+		background: white;
 		transform: translateX(100%);
+		overflow: hidden;
+		width: 100%;
+		height: 100%;
 		.table{}
 		iframe{
 			display: block;

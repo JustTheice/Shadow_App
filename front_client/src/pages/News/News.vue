@@ -25,7 +25,7 @@
 				<li class="more">
 				</li>
 				<li v-for="(item, index) in news">
-					<router-link :to="'/topic?url='+item.url">
+					<!-- <router-link :to="'/topic?url='+item.url">
 						<div class="left">
 							<img v-lazy="item.picUrl" alt="暂无"/>
 						</div>
@@ -33,10 +33,21 @@
 							<h4>{{item.title}}</h4>
 							<span class="time">{{item.ctime}}</span>
 						</div>
-					</router-link>
+					</router-link> -->
+					<a @click="toTopic(item.url)">
+						<div class="left">
+							<img v-lazy="item.picUrl" alt="暂无"/>
+						</div>
+						<div class="right">
+							<h4>{{item.title}}</h4>
+							<span class="time">{{item.ctime}}</span>
+						</div>
+					</a>
 				</li>
 			</ul>
 		</section>
+		<Topic :url="cUrl" :shows="shows" :style="{transform: shows.topic?'translateX(0)':'translateX(100%)'}"></Topic>
+		<!-- <Topic :url="cUrl" :shows="shows" v-if="shows.topic"></Topic> -->
 	</section>
 </template>
 
@@ -44,9 +55,20 @@
 	import BScroll from 'better-scroll';
 	import { Indicator } from 'mint-ui';
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
+	import Topic from '../../components/Topic/Topic.vue';
 	export default{
 		components: {
-			HeaderTop,
+			HeaderTop, Topic
+		},
+		data(){
+			return {
+				cUrl: '',
+				shows: {
+					topic: false
+				},
+				news: [],
+				cIndex: 0
+			}
 		},
 		mounted() {
 			//新闻导航滚动
@@ -88,12 +110,6 @@
 				});
 			}else{
 				this.news = this.$store.state.news['IT'];
-			}
-		},
-		data(){
-			return {
-				news: [],
-				cIndex: 0
 			}
 		},
 		methods: {
@@ -139,6 +155,10 @@
 					this.news = this.$store.state.news[type];
 				}
 				this.cIndex = index;
+			},
+			toTopic(url){
+				this.cUrl = url;
+				this.shows.topic=true;
 			}
 		}
 	}
