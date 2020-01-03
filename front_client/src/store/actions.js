@@ -1,7 +1,7 @@
 import apis from '../api/news.js';
 import {reqLogin} from '../api/server.js';
 export default {
-	async getNews({commit,state}, {type,cb}){
+	async getNews({commit,state}, {type,cb}){ //获取新闻
 		let fn = 'req'+type+'News';
 		let ret = await apis[fn]();
 		if(ret.code === 200){
@@ -15,11 +15,15 @@ export default {
 		}
 		cb && cb(type);
 	},
-	saveUser({commit}, {userInfo}){
+	saveUser({commit}, {userInfo}){ //存储用户信息
 		commit('UPDATE_USERINFO', {userInfo});
 	},
-	updateSize({commit}, {newV}){
+	updateSize({commit}, {newV}){ //调节字体
 		newV *= 0.4;
 		commit('UPDATE_SIZE', {newV})
+	},
+	"SOCKET_chat message"({commit}, item) { //更新聊天室消息记录
+		console.log(item);
+		commit('UPDATE_CHAT_MSG',{item});
 	}
 }

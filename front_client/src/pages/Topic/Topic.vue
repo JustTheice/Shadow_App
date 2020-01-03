@@ -1,5 +1,5 @@
 <template>
-	<section>
+	<section ref="topic" id="topic">
 		<HeaderTop title="新闻页">
 			<a href="javacript:;" slot="left" class="iconfont icon-back left" @touchstart="$router.back()"></a>
 		</HeaderTop>
@@ -47,7 +47,7 @@
 </script>
 
 <style lang="less">
-	section{
+	#topic{
 		overflow: hidden;
 		height: 100%;
 		.table{}

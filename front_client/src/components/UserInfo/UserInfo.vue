@@ -3,7 +3,7 @@
 		<div class="top">
 			<div class="back iconfont icon-back" @click="shows.userInfo=false">
 			</div>
-			<h2>个人信息</h2>
+			<h2>个人资料</h2>
 		</div>
 		<form action="/">
 			<mt-field label="昵称" placeholder="请输入用户名" v-model="userInfo.name"></mt-field>
@@ -57,6 +57,7 @@
 		transform: translateX(100%);
 		transition: .3s;
 		background: whitesmoke;
+		z-index: 20;
 		.top{
 			width: 100%;
 			height: 2rem;

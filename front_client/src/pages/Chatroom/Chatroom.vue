@@ -3,34 +3,32 @@
 		<HeaderTop title="聊天室"></HeaderTop>
 		<div class="recreations">
 			<div>
-				<h3>你画我猜</h3>
+				<h3 @click="drawSth">你画我猜</h3>
 				<ul>
 					<li>房间1</li>
 				</ul>
 			</div>
 		</div>
 		<div class="chatbox">
-			<div class="content">
+			<div class="content" ref="content">
 				<ul>
-					<li class="others">
+					<li v-for="(msg,index) in chatMsgs" :class="msg.name==$store.state.userInfo.name?'self':'others'" :key="index">
 						<img src="./img/avatar.png" alt="头像">
 						<div>
-							<p class="name">其他人说：</p>
-							<p class="msg adjust" :style="{'font-size': settings.adjustSize+'rem'}">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
-						</div>
-					</li>
-					<li class="self">
-						<img src="./img/avatar.png" alt="头像">
-						<div>
-							<p class="name">我说：</p>
-							<p class="msg adjust" :style="{'font-size': settings.adjustSize+'rem'}">说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊说说说屁啊啊啊 啊啊啊啊</p>
+							<p class="name">{{msg.name==$store.state.userInfo.name?'我':msg.name}}说：</p>
+							<p class="msg adjust" :style="{'font-size': settings.adjustSize+'rem'}">{{msg.msg}}</p>
 						</div>
 					</li>
 				</ul>
 			</div>
 			<div class="control">
-				<input type="text">
-				<mt-button type="primary">发送</mt-button>
+				<div class="can-send">
+					<input type="text" v-model="chatMsg">
+					<mt-button type="primary" @click="sendMsg">发送</mt-button>
+				</div>
+				<div class="to-login" v-show="!$store.state.userInfo._id">
+					<p><router-link to="/profile">登录</router-link>后才能参与聊天</p>
+				</div>
 			</div>
 		</div>
 	</section>
@@ -39,30 +37,51 @@
 <script>
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
 	import {mapState} from 'vuex';
-	import { Button } from 'mint-ui';
-	import io from 'socket.io';
+	import { Button,Toast } from 'mint-ui';
+	import BScroll from 'better-scroll';
+	// import io from 'socket.io-client'
 	export default{
 		components: {
 			HeaderTop,
+		},
+		data(){
+			return {
+				chatMsg: '',
+			}
 		},
 		mounted() {
 			this.initH();
 			window.onresize = () => {
 				this.initH();
-			}
+			};
 			
-			//连接聊天服务器
-			let socket = io();
+			new BScroll(this.$refs.content, {
+				scrollY: true,
+				scrollX: false,
+				click: true,
+			});
 		},
 		computed: {
-			...mapState(['settings'])
+			...mapState(['settings','chatMsgs'])
 		},
+		
 		methods: {
 			initH(){ //动态设置高度
 				let scale = document.documentElement.clientWidth/16;
 				let chatWrap = this.$refs.chatroom;
 				chatWrap.style.height = (document.documentElement.clientHeight-document.querySelector('#nav').offsetHeight) + 'px';
 				chatWrap.querySelector('.content').style.height = (chatWrap.offsetHeight - chatWrap.querySelector('header').offsetHeight - chatWrap.querySelector('.recreations').offsetHeight-2*scale) + 'px';
+			},
+			sendMsg(){
+				let {chatMsg} = this;
+				if(!chatMsg){
+					return;
+				}
+				this.$socket.emit('chat message', {name:this.$store.state.userInfo.name, msg:chatMsg});
+				this.chatMsg = '';
+			},
+			drawSth(){
+				Toast('即将开放，敬请期待！');
 			}
 		}
 	}
@@ -73,6 +92,8 @@
 	#chatroom{
 		position: relative;
 		.recreations{
+			position: relative;
+			z-index: 30;
 			width: 100%;
 			display: flex;
 			flex-direction: row;
@@ -107,6 +128,7 @@
 				background: rgb(245,245,245);
 				.oneLine(gray);
 				ul{
+					// height: 1500px;
 					li{
 						.clearfix();
 						padding: .5rem;
@@ -129,7 +151,6 @@
 									border-radius: .2rem;
 									position: relative;
 									max-width: 8rem;
-									
 								}
 							}
 						}
@@ -187,28 +208,46 @@
 			.control{
 				background: rgb(245,245,245);
 				height: 2rem;
+				width: 100%;
+				box-sizing: border-box;
 				line-height: 2rem;
 				padding: 0 .4rem;
 				position: absolute;
-				bottom: 0;
-				input[type=text]{
-					color: darkgray;
-					display: inline-block;
-					width: 12rem;
-					height: 1.6rem;
-					box-sizing: border-box;
-					padding: .1rem;
-					line-height: 1.4rem;
-					font-size: .9rem;
-					border-radius: .2rem;
-					outline: none;
-					vertical-align: 0.05rem;
+				left: 0;
+				.can-send{
+					input[type=text]{
+						color: darkgray;
+						display: inline-block;
+						width: 12rem;
+						height: 1.6rem;
+						box-sizing: border-box;
+						padding: .1rem;
+						line-height: 1.4rem;
+						font-size: .9rem;
+						border-radius: .2rem;
+						outline: none;
+						vertical-align: 0.05rem;
+					}
+					button{
+						display: inline-block;
+						width: 2.8rem;
+						height: 1.6rem;
+						vertical-align: 0.05rem;
+					}
 				}
-				button{
-					display: inline-block;
-					width: 2.8rem;
-					height: 1.6rem;
-					vertical-align: 0.05rem;
+				.to-login{
+					font-size: .8rem;
+					width: 100%;
+					p{
+						a{
+							color: limegreen;
+						}
+						margin-left: 3rem;
+					}
+					position: absolute;
+					top: 0;
+					left: 0rem;
+					background: rgba(230,230,230,.5);
 				}
 			}
 		}

@@ -11,5 +11,6 @@ export default {
 	},
 	settings: {
 		adjustSize: 0.8
-	}
+	},
+	chatMsgs: []
 }

@@ -7,11 +7,11 @@ const loginRouter = require('./router/login.js');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const path = require('path');
-const http = require('http').createServer(app); 
-const io = require('socket.io')('http');
+const server = require('http').createServer(app); 
+const io = require('socket.io')(server);
 
 app.all('*', function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'http://192.168.2.104');
+  res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', '*');
   res.header('Content-Type', 'application/json;charset=utf-8');
@@ -48,11 +48,13 @@ let proxys = {
 }
 app.use('/film', proxyMiddleWare(proxys)); 
 app.use('/static/',express.static(path.join(__dirname,'./static/')));
+// app.get('/', (req, res, next) => {
+// 	res.type('html');
+// 	res.sendFile(path.join(__dirname,'./view/index.html'));
+// });
 app.get('/', (req, res, next) => {
-	res.type('html');
-	res.sendFile(path.join(__dirname,'./view/index.html'));
-});
-
+	console.log(111);
+})
 
 //设置允许跨域访问该服务.
 
@@ -66,10 +68,11 @@ app.use(helmet({
 io.on('connection', function(socket){
 	console.log('一个用户连接到了socket');
 	socket.on('chat message', function(msg){
+		console.log(msg)
 		io.emit('chat message', msg);
 	});
 })
 
-app.listen(5000, () => {
+server.listen(5000, () => {
 	console.log('server is running...');
 });

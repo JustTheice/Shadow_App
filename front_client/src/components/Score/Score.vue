@@ -18,7 +18,7 @@
 					<li v-for="(rank,index) in ranks" :key="index">
 						<span class="rank-place">{{index+1}}</span>
 						<img src="./img/avatar.png" alt="头像">
-						<span class="rank-name">{{rank.name}}</span>
+						<span class="rank-name">{{rank.name==$store.state.userInfo.name?'我':rank.name}}</span>
 						<span class="rank-score">{{rank.integral}}</span>
 					</li>
 				</ul>

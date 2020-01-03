@@ -7,5 +7,8 @@ export default {
 	},
 	UPDATE_SIZE(state, {newV}){
 		state.settings.adjustSize = newV;
+	},
+	UPDATE_CHAT_MSG(state, {item}){ //更新聊天内容
+		state.chatMsgs.push(item);
 	}
 }

@@ -24,26 +24,20 @@
 				<mt-field label="验证码" placeholder="短信验证码" type="password" v-model="phoneData.phoneCode"></mt-field>
 				<mt-button type="primary" size="large" @click="login">注册/登录</mt-button>
 			</div>
+			<div class="instruction">
+				<p>如果账号已注册则登录，如果未注册则注册，请牢记密码，丢失暂不可找回</p>
+			</div>
 		</div>
 	</section>
 </template>
 
 <script>
 	import { MessageBox } from 'mint-ui';
-	import {reqPhoneCode, reqLogin, autoLogin} from '../../api/server.js';
+	import {reqPhoneCode, reqLogin} from '../../api/server.js';
 	export default {
 		props: ['shows'],
 		mounted() {
-			autoLogin().then(
-				(ret) => {
-					if(ret.code===0){
-						this.$store.dispatch('saveUser', {userInfo: ret.data});
-					}
-				},
-				(err) => {
-					console.log('自动登陆失败'+err)
-				}
-			)
+			
 		},
 		computed: {
 		},
@@ -143,7 +137,7 @@
 		position: absolute;
 		top: 0;
 		left: 0;
-		z-index: 10;
+		z-index: 20;
 		transform: translateX(100%);
 		background: whitesmoke;
 		transition: .3s;
@@ -194,6 +188,15 @@
 				width: 30%;
 				height: 1rem;
 			}
+			.instruction{
+				margin-top: .5rem;
+				p{
+					font-size: .6rem;
+					line-height: .8rem;
+					color: gray;
+				}
+			}
 		}
+		
 	}
 </style>
