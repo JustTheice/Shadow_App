@@ -31,7 +31,11 @@
 					console.log('自动登陆失败'+err)
 				}
 			);
+			
 		},
+		methods: {
+			
+		}
 	}
 </script>
 

@@ -5,7 +5,7 @@
 			<div class="row row-life">
 				<h3>生活类</h3>
 				<div class="items">
-					<div class="item-tool">
+					<div class="item-tool" @click="shows.weather=true">
 						<i class="iconfont icon-weather"></i>
 						<span>天气预报</span>
 					</div>
@@ -25,14 +25,23 @@
 				</div>
 			</div>
 		</section>
+		<Weather v-if="shows.weather" :shows="shows"></Weather>
 	</section>
 </template>
 
 <script>
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
+	import Weather from '../../components/Weather/Weather.vue';
 	export default{
 		components: {
-			HeaderTop,
+			HeaderTop, Weather
+		},
+		data(){
+			return {
+				shows: {
+					weather: false
+				}
+			}
 		}
 	}
 </script>
