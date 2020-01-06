@@ -5,7 +5,7 @@
 			<div class="row row-life">
 				<h3>生活类</h3>
 				<div class="items">
-					<div class="item-tool" @click="shows.weather=true">
+					<div class="item-tool" @touchend="shows.weather=true">
 						<i class="iconfont icon-weather"></i>
 						<span>天气预报</span>
 					</div>
@@ -14,34 +14,36 @@
 			<div class="row row-life">
 				<h3>小游戏</h3>
 				<div class="items">
-					<div class="item-tool">
+					<div class="item-tool" @touchend="shows.riddles=true">
 						<i class="iconfont icon-lantern"></i>
 						<span>猜灯谜</span>
-					</div>
-					<div class="item-tool">
-						<i class="iconfont icon-light"></i>
-						<span>脑筋急转弯</span>
 					</div>
 				</div>
 			</div>
 		</section>
 		<Weather v-if="shows.weather" :shows="shows"></Weather>
+		<Riddles v-if="shows.riddles" :shows="shows"></Riddles>
 	</section>
 </template>
 
 <script>
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
 	import Weather from '../../components/Weather/Weather.vue';
+	import Riddles from '../../components/Riddles/Riddles.vue';
 	export default{
 		components: {
-			HeaderTop, Weather
+			HeaderTop, Weather, Riddles
 		},
 		data(){
 			return {
 				shows: {
-					weather: false
+					weather: false,
+					riddles: false
 				}
 			}
+		},
+		mounted() {
+			
 		}
 	}
 </script>
@@ -49,6 +51,9 @@
 <style lang="less">
 	@import '../../../static/css/mixin.less';
 	section{
+		position: relative;
+		overflow: hidden;
+		height: 100%;
 		#tools{
 			padding: .8rem;
 			.row{

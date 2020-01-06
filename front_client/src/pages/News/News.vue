@@ -167,7 +167,9 @@
 <style lang="less">
 	#news{
 		overflow: hidden;
+		position: relative;
 		height: 100%;
+		width: 16rem;
 		#news-nav{
 			width: 100%;
 			height: 1.7rem;

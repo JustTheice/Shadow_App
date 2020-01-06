@@ -69,7 +69,6 @@
 			}
 		},
 		mounted() {
-			
 			reqWeather('邯郸').then(
 				(ret) => {
 					if(ret.code===200){
@@ -216,6 +215,11 @@
 						padding-top: 5%;
 						font-size: .7rem;
 						font-weight: 200;
+					}
+					&.wind{
+						p{
+							font-size: .8rem;
+						}
 					}
 				}
 			}
