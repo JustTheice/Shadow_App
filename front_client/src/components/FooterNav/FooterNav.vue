@@ -1,21 +1,21 @@
 <template>
 	<Nav id='nav'>
-		<router-link to="/news" :class="{active: $route.path=='/news'}">
+		<router-link to="/news" :class="{active: $route.path=='/news'}" replace>
 			<i class="iconfont icon-news"></i>
 			<h2>资讯</h2>
 		</router-link>
 	
-		<router-link to="chatroom" :class="{active: $route.path=='/chatroom'}">
+		<router-link to="chatroom" :class="{active: $route.path=='/chatroom'}" replace>
 			<i class="iconfont icon-chatroom"></i>
 			<h2>聊天室</h2>
 		</router-link>
 	
-		<router-link to="tools" :class="{active: $route.path=='/tools'}">
+		<router-link to="tools" :class="{active: $route.path=='/tools'}" replace>
 			<i class="iconfont icon-tools"></i>
 			<h2>工具箱</h2>
 		</router-link>
 	
-		<router-link to="profile" :class="{active: $route.path=='/profile'}">
+		<router-link to="profile" :class="{active: $route.path=='/profile'}" replace>
 			<i class="iconfont icon-profile"></i>
 			<h2>我的</h2>
 		</router-link>

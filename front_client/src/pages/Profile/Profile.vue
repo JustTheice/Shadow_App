@@ -6,10 +6,10 @@
 				<img src="./img/avatar.png">
 			</div>
 			<div class="right">
-				<div class="not-login" v-show="!userInfo._id" @click="shows.login=true">
+				<div class="not-login" v-show="!userInfo._id" @touchstart="shows.login=true">
 					<p>登陆/注册&gt;&gt;</p>
 				</div>
-				<div class="logined" v-show="userInfo._id" @click="shows.userInfo=true">
+				<div class="logined" v-show="userInfo._id" @touchstart="shows.userInfo=true">
 					<div class="lv">
 						<span>LV{{userInfo.lv}}</span>
 						<span>弟中弟</span>
@@ -22,10 +22,10 @@
 			</div>
 		</div>
 		<div id="cells">
-			<mt-cell title="我的积分" is-link @click.native="shows.score=true">
+			<mt-cell title="我的积分" is-link @touchend.native="shows.score=true">
 			  <span slot="icon" class="iconfont icon-score"></span>
 			</mt-cell>
-			<mt-cell title="设置" is-link to="javascript:;" @click.native="shows.setting=true">
+			<mt-cell title="设置" is-link to="javascript:;" @touchend.native="shows.setting=true">
 			  <span slot="icon" class="iconfont icon-setting"></span>
 			</mt-cell>
 		</div>
@@ -43,7 +43,7 @@
 	import UserInfo from '../../components/UserInfo/UserInfo.vue';
 	import Score from '../../components/Score/Score.vue';
 	import {mapState} from 'vuex';
-	import { Cell } from 'mint-ui';
+	import { Cell, Toast } from 'mint-ui';
 	export default{
 		components: {
 			HeaderTop, Login, Setting, UserInfo, Score
@@ -61,23 +61,38 @@
 		computed: {
 			...mapState(['userInfo']),
 		},
-		mounted() {
-			if (window.history && window.history.pushState) {
-		    history.pushState(null, null, document.URL);
-		    window.addEventListener('popstate', this.backFn, false);//false阻止默认事件
-		  }
-		},
-		methods: {
-			backFn(){
-				for (let key in this.shows) {
-					if(this.shows.key===true){
-						this.shows.key = false;
+		watch: {
+			shows: { //监视shows，如果有一个二级组件被加载，则加载一次历史记录以供返回到一级页面
+				deep: true,
+				handle: (b) => { 
+					console.log('监视到了')
+					for (let key in v) {
+						if(v[key]){
+							window.history.pushState(null, null, '#/profile');
+						}
 					}
 				}
 			}
 		},
+		mounted() {
+			window.addEventListener('popstate', this.backFn, false);
+			
+		},
+		methods: {
+			backFn(ev){
+				let vm = this;
+				ev.preventDefault();
+				let {shows} = vm
+				for (let key in shows) {
+					if(shows[key]){
+						shows[key] = false;
+					}
+				}
+				
+			}
+		},
 		destroyed() {
-			window.removeEventListener('popstate', this.backFn, false);
+			window.removeEventListener('popstate', this.backFn);
 		}
 	}
 </script>

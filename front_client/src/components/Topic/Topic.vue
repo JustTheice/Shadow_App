@@ -1,7 +1,7 @@
 <template>
 	<section ref="topic" id="topic">
 		<HeaderTop title="新闻页">
-			<a href="javacript:;" slot="left" class="iconfont icon-back left" @touchstart="shows.topic=false"></a>
+			<a href="javacript:;" slot="left" class="iconfont icon-back left" @touchend="shows.topic=false"></a>
 		</HeaderTop>
 		<div class="table">
 			<!-- <a href="http"></a> -->

@@ -32,6 +32,8 @@
 				}
 			);
 			
+			let vm = this;
+			
 		},
 		methods: {
 			

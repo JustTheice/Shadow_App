@@ -10,6 +10,8 @@ import VueLazyload from 'vue-lazyload';
 //websocket
 import VueSocketIO from 'vue-socket.io'
 
+import '../static/js/backfix.js';
+
 Vue.config.productionTip = true;
 
 Vue.use(MintUI);

@@ -1,28 +1,28 @@
 <template>
 	<section id="login" ref="wrap">
-		<div class="back iconfont icon-back" @click="shows.login=false">
+		<div class="back iconfont icon-back" @touchend="shows.login=false">
 		</div>
 		<div id="container">
 			<div class="type">
-				<h3 @click="type='pwd'">密码登录</h3>
-				<h3 @click="type='phone'">手机登录</h3>
+				<h3 @touchstart="type='pwd'">密码登录</h3>
+				<h3 @touchstart="type='phone'">手机登录</h3>
 				<div class="slide" :style="{left: type=='pwd'?'.5rem':'6.5rem'}"></div>
 			</div>
 			<div class="pwd" v-show="type=='pwd'">
 				<mt-field label="用户名" placeholder="昵称/手机号" v-model="pwdData.name"></mt-field>
 				<mt-field label="密码" placeholder="密码" type="password" v-model="pwdData.pwd"></mt-field>
 				<mt-field label="验证码" placeholder="不分大小写" type="text" v-model="pwdData.imgCode">
-					<img :src="imgCodeSrc" alt="验证码" class="img-code" @click="getImgCode"/>
+					<img :src="imgCodeSrc" alt="验证码" class="img-code" @touchstart="getImgCode"/>
 				</mt-field>
-				<mt-button type="primary" size="large" @click="login()">注册/登录</mt-button>
+				<mt-button type="primary" size="large" @touchend="login()">注册/登录</mt-button>
 			</div>
 			<div class="phone" v-show="type=='phone'">
 				<mt-field label="手机号" placeholder="仅支持中国大陆" type="tel" v-model="phoneData.phone">
-					<mt-button type="primary" size="small" @click.native="getPhoneCode" v-show="!codeCount">获取</mt-button>
+					<mt-button type="primary" size="small" @touchend.native="getPhoneCode" v-show="!codeCount">获取</mt-button>
 					<span v-show="codeCount">{{codeCount}}s</span>
 				</mt-field>
 				<mt-field label="验证码" placeholder="短信验证码" type="password" v-model="phoneData.phoneCode"></mt-field>
-				<mt-button type="primary" size="large" @click="login">注册/登录</mt-button>
+				<mt-button type="primary" size="large" @touchend="login">注册/登录</mt-button>
 			</div>
 			<div class="instruction">
 				<p>如果账号已注册则登录，如果未注册则注册，请牢记密码，丢失暂不可找回</p>

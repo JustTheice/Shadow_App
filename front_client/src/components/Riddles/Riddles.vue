@@ -1,39 +1,103 @@
 <template>
-	<section id="riddles">
+	<section id="riddles" ref="riddles">
 		<div class="top">
 			<div class="iconfont icon-back" @touchend="back"></div>
 			<h3>猜灯谜</h3>
 		</div>
-		<div class="content">
-			<div class="answer">
-				<p class="result">回答正确</p>
-				<p class="description">吹不散的雾，隐没了意图，谁轻柔踱步————停住，还来不及哭穿透的子弹就带走温度</p>
+		<div class="content" ref="content">
+			<div class="answer" :style="{opacity: status===0 ? 0 : 1}">
+				<p class="result">{{status===1 ? '回答正确' : (status===2?'回答错误':'这都不会？')}}
+					<span v-show="status!==1">答案是{{answer}}</span>
+				</p>
+				<p class="description">{{description}}</p>
 			</div>
-			<div class="question">
-				<p class="riddle">微凉的晨露沾湿黑礼服，石板上有雾父在低诉。无奈的觉悟只能更残酷，一切都为了通往圣堂的路</p>
-				<p class="type">打一二三</p>
+			<div class="question" ref="question">
+				<p class="riddle">{{riddle}}</p>
+				<p class="type">{{type}}</p>
 			</div>
-			
 		</div>
-		<div class="control">
-			<input type="text">
-			<mt-button size="large" type="default">确定答案</mt-button>
-			<mt-button size="large" type="primary">再来一题/不会</mt-button>
+		<div class="control" ref="control">
+			<input type="text" v-model="value">
+			<mt-button size="large" type="default" @touchend.native="submit(true)">确定答案</mt-button>
+			<mt-button size="large" type="primary" @touchend.native="submit(false)" v-show="status===0">不会</mt-button>
+			<mt-button size="large" type="primary" @touchend.native="next" v-show="status!==0">再来一题</mt-button>
 		</div>
-		<div class="instruction">
+		<div class="instruction" ref="instruction">
 			<p>根据提示，在输出框内输入答案即可</p>
 		</div>
 	</section>
 </template>
 
 <script>
-	import {MessageBox} from 'mint-ui'
+	import {MessageBox, Toast, Indicator} from 'mint-ui'
+	import {reqRiddle} from '../../api/tools.js';
 	export default {
 		props: ['shows'],
+		data(){
+			return {
+				riddle: '',
+				answer: '',
+				type: '',
+				description: '',
+				value: '',
+				status: 0, //回答状态  0未回答，1回答正确，2回答错误 3不会
+			}
+		},
+		mounted() {
+			Indicator.open('寻找灯谜中');
+			this.updateRiddle(() => {
+				this.$refs.question.style.transform = 'translateX(0)';
+			});
+			let {instruction, content, control, riddles} = this.$refs;
+			instruction.style.height = (riddles.clientHeight-content.offsetHeight-control.offsetHeight) + 'px';
+		},
 		methods: {
 			back(){
 				// MessageBox('不玩了吗？').then(action => this.shows.riddles=false);
 				this.shows.riddles=false
+			},
+			submit(r){ //处理回答
+				if(r){
+					if(this.status!==0){
+						return;
+					}
+					if(this.value==this.answer){
+						this.status = 1;
+					}else{
+						this.status = 2;
+					}
+					this.value = '';
+				}else{
+					this.status = 3;
+				}
+			},
+			updateRiddle(cb){ //再来一道
+				this.value = '';
+				reqRiddle().then(
+					ret => {
+						Indicator.close();
+						if(ret.code===200){
+							let {riddle, answer, type, description} = ret.newslist[0];
+							this.riddle = riddle;
+							this.answer = answer;
+							this.type = type;
+							this.description = description;
+							cb && cb();
+						}
+					}, err => {
+						console.log(+err);
+						Toast('灯谜获取失败，请稍后在玩');
+					}
+				);
+			},
+			next(){
+				this.status = 0;
+				this.$refs.question.style.transform = 'translateX(100%)'
+				this.$refs.question.style.transition = 'none';
+				this.updateRiddle(() => {
+					this.$refs.question.style.transform = 'translateX(0)';
+					this.$refs.question.style.transition = '.2s';
+				})
 			}
 		}
 	}
@@ -51,6 +115,7 @@
 		.top{
 			height: 8%;
 			position: relative;
+			min-height: 2rem;
 			.icon-back{
 				position: absolute;
 				top: 50%;
@@ -76,8 +141,10 @@
 			padding: 1rem 2rem;
 			.question{
 				box-sizing: border-box;
+				transition: .2s;
 				min-height: 40%;
 				padding-top: 1rem;
+				transform: translateX(100%);
 				.riddle{
 					font-size: .8rem;
 					line-height: 1rem;
@@ -91,11 +158,16 @@
 			.answer{
 				min-height: 60%;
 				margin-bottom: .5rem;
+				transition: .2s;
 				.result{
 					color: red;
 					text-align: center;
-					font-size: 1.2rem;
+					font-size: 1.1rem;
 					padding-bottom: .3rem;
+					>span{
+						color: rgb(50,50,50);
+						font-size: 1rem;
+					}
 				}
 				.description{
 					font-size: .7rem;
@@ -121,13 +193,16 @@
 		.instruction{
 			color: rgb(50,50,50);
 			padding: 0 2rem;
-			position: absolute;
 			bottom: 1rem;
 			box-sizing: border-box;
 			width: 100%;
 			font-size: .6rem;
+			position: relative;
 			p{
+				width: 12rem;
 				text-align: center;
+				position: absolute;
+				bottom: 2rem;
 			}
 		}
 	}

@@ -1,7 +1,7 @@
 <template>
 	<section id="score" ref="score">
 		<div class="top" ref="top">
-			<div class="back iconfont icon-back" @click="shows.score=false">
+			<div class="back iconfont icon-back" @touchend="shows.score=false">
 			</div>
 			<h2>积分</h2>
 		</div>
@@ -10,8 +10,8 @@
 		</div>
 		<div class="content" ref="content">
 			<div class="type" ref="type">
-				<h3 :class="{active: type===0}" @click="type=0">排行榜</h3>
-				<h3 :class="{active: type===1}" @click="type=1">积分兑奖</h3>
+				<h3 :class="{active: type===0}" @touchstart="type=0">排行榜</h3>
+				<h3 :class="{active: type===1}" @touchstart="type=1">积分兑奖</h3>
 			</div>
 			<div class="rank" ref="rank" v-show="type===0">
 				<ul>

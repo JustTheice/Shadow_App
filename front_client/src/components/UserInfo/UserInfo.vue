@@ -1,7 +1,7 @@
 <template>
 	<section id="user-info">
 		<div class="top">
-			<div class="back iconfont icon-back" @click="shows.userInfo=false">
+			<div class="back iconfont icon-back" @touchend="shows.userInfo=false">
 			</div>
 			<h2>个人资料</h2>
 		</div>
@@ -11,7 +11,7 @@
 			<mt-field label="生日" placeholder="请输入生日" type="date" v-model="userInfo.birthday"></mt-field>
 			<mt-field label="自我介绍" type="textarea" rows="4" v-model="userInfo.introduction"></mt-field>
 			<input type="hidden" v-model="userInfo._id">
-			<mt-button type="default" size="large" @click.prevent="sendChange">确认修改</mt-button>
+			<mt-button type="default" size="large" @touchend.prevent="sendChange">确认修改</mt-button>
 		</form>
 	</section>
 </template>

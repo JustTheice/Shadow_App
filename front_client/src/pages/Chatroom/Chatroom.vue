@@ -3,7 +3,7 @@
 		<HeaderTop title="聊天室"></HeaderTop>
 		<div class="recreations">
 			<div>
-				<h3 @click="drawSth">你画我猜</h3>
+				<h3 @touchstart="drawSth">你画我猜</h3>
 				<ul>
 					<li>房间1</li>
 				</ul>
@@ -24,7 +24,7 @@
 			<div class="control">
 				<div class="can-send">
 					<input type="text" v-model="chatMsg">
-					<mt-button type="primary" @click="sendMsg">发送</mt-button>
+					<mt-button type="primary" @touchend="sendMsg">发送</mt-button>
 				</div>
 				<div class="to-login" v-show="!$store.state.userInfo._id">
 					<p><router-link to="/profile">登录</router-link>后才能参与聊天</p>
