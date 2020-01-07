@@ -64,8 +64,7 @@
 		watch: {
 			shows: { //监视shows，如果有一个二级组件被加载，则加载一次历史记录以供返回到一级页面
 				deep: true,
-				handle: (b) => { 
-					console.log('监视到了')
+				handler(v){ 
 					for (let key in v) {
 						if(v[key]){
 							window.history.pushState(null, null, '#/profile');
@@ -76,7 +75,7 @@
 		},
 		mounted() {
 			window.addEventListener('popstate', this.backFn, false);
-			
+			Toast('由于家境贫寒，仅在家里局域网环境内才可登陆');
 		},
 		methods: {
 			backFn(ev){

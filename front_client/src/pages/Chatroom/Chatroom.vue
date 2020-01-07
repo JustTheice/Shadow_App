@@ -60,6 +60,8 @@
 				scrollX: false,
 				click: true,
 			});
+			
+			Toast('由于家境贫寒，聊天室及多人游戏仅对家里局域网开放');
 		},
 		computed: {
 			...mapState(['settings','chatMsgs'])

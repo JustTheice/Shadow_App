@@ -46,7 +46,7 @@
 				</li>
 			</ul>
 		</section>
-		<Topic :url="cUrl" :shows="shows" :style="{transform: shows.topic?'translateX(0)':'translateX(100%)'}"></Topic>
+		<Topic :url="cUrl" :shows="shows" :style="{transform: shows.topic?'translateX(0)':'translateX(100%)'}" ref="topic"></Topic>
 		<!-- <Topic :url="cUrl" :shows="shows" v-if="shows.topic"></Topic> -->
 	</section>
 </template>
@@ -70,6 +70,7 @@
 				cIndex: 0
 			}
 		},
+		
 		mounted() {
 			//新闻导航滚动
 			let navTop = this.$refs.navTop;
@@ -111,6 +112,7 @@
 			}else{
 				this.news = this.$store.state.news['IT'];
 			}
+		
 		},
 		methods: {
 			getType(index){ //获取相应新闻类型
@@ -160,6 +162,9 @@
 				this.cUrl = url;
 				this.shows.topic=true;
 			}
+		},
+		destroyed() {
+			window.removeEventListener('popstate', this.backFn);
 		}
 	}
 </script>
