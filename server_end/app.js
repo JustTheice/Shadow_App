@@ -53,7 +53,6 @@ app.use('/static/',express.static(path.join(__dirname,'./static/')));
 // 	res.sendFile(path.join(__dirname,'./view/index.html'));
 // });
 app.get('/', (req, res, next) => {
-	console.log(111);
 })
 
 //设置允许跨域访问该服务.

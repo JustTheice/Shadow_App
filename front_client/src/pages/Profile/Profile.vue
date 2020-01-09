@@ -74,7 +74,6 @@
 			}
 		},
 		mounted() {
-			window.addEventListener('popstate', this.backFn, false);
 			Toast('由于家境贫寒，仅在家里局域网环境内才可登陆');
 		},
 		methods: {
@@ -87,11 +86,19 @@
 						shows[key] = false;
 					}
 				}
-				
 			}
 		},
 		destroyed() {
 			window.removeEventListener('popstate', this.backFn);
+		},
+		beforeRouteEnter(to, from, next) {
+			next(function(vm){
+				window.addEventListener('popstate', vm.backFn, false);
+			});
+		},
+		beforeRouteLeave(to, from, next) {
+			window.removeEventListener('popstate', this.backFn);
+			next();
 		}
 	}
 </script>

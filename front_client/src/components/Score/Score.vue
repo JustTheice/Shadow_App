@@ -1,7 +1,7 @@
 <template>
 	<section id="score" ref="score">
 		<div class="top" ref="top">
-			<div class="back iconfont icon-back" @touchend="shows.score=false">
+			<div class="back iconfont icon-back" @touchend="btnBack">
 			</div>
 			<h2>积分</h2>
 		</div>
@@ -65,6 +65,11 @@
 			return {
 				type: 0,
 				ranks: []
+			}
+		},
+		methods: {
+			btnBack(){
+				window.history.back();
 			}
 		}
 	}

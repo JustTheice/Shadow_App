@@ -164,8 +164,18 @@
 			}
 		},
 		destroyed() {
-			window.removeEventListener('popstate', this.backFn);
-		}
+			window.removeEventListener('popstate', this.$refs.topic.backFn);
+		},
+		beforeRouteEnter(to, from, next) {
+			next(function(vm){
+				window.addEventListener('popstate', vm.$refs.topic.backFn, false);
+			});
+		},
+		beforeRouteLeave(to, from, next) {
+			window.removeEventListener('popstate', this.$refs.topic.backFn);
+			next();
+		},
+		
 	}
 </script>
 

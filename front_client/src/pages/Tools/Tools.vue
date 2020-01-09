@@ -43,7 +43,38 @@
 			}
 		},
 		mounted() {
-			
+		},
+		watch: {
+			shows: { //监视shows，如果有一个二级组件被加载，则加载一次历史记录以供返回到一级页面
+				deep: true,
+				handler(v){ 
+					for (let key in v) {
+						if(v[key]){
+							window.history.pushState(null, null, '#/tools');
+						}
+					}
+				}
+			}
+		},
+		methods: {
+			backFn(ev){
+				let vm = this;
+				let {shows} = vm
+				for (let key in shows) {
+					if(shows[key]){
+						shows[key] = false;
+					}
+				}
+			}
+		},
+		beforeRouteEnter(to, from, next) {
+			next(function(vm){
+				window.addEventListener('popstate', vm.backFn, false);
+			});
+		},
+		beforeRouteLeave(to, from, next) {
+			window.removeEventListener('popstate', this.backFn);
+			next(true);
 		}
 	}
 </script>

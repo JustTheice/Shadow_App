@@ -1,6 +1,6 @@
 <template>
 	<section id="setting">
-		<div class="back iconfont icon-back" @touchend="shows.setting=false"></div>
+		<div class="back iconfont icon-back" @touchend="btnBack"></div>
 		<div class="font-setting">
 			<h3 class="adjust" :style="{'font-size': $store.state.settings.adjustSize + 'rem'}">字体大小</h3>
 			<div class="right">
@@ -14,13 +14,13 @@
 			<h3>修改密码</h3>
 			<mt-field label="旧密码" placeholder="请输入旧密码" type="password" v-model="pwds.oldPwd"></mt-field>
 			<mt-field label="新密码" placeholder="请输入新密码" type="password" v-model="pwds.newPwd"></mt-field>
-			<mt-button size="large" type="primary" @touchend="changePwd">确认修改</mt-button>
+			<mt-button size="large" type="primary" @touchend.prevent.native="changePwd">确认修改</mt-button>
 		</div>
 		<div class="logout" v-show="userId">
-			<mt-button size="large" type="danger" @touchend="logout">退出账号</mt-button>
+			<mt-button size="large" type="danger" @touchend.prevent.native="logout">退出账号</mt-button>
 		</div>
 		<div class="logoff" v-show="userId">
-			<mt-button size="large" type="danger" @touchend="signout">注销账号</mt-button>
+			<mt-button size="large" type="danger" @touchend.prevent.native="signout">注销账号</mt-button>
 		</div>
 	</section>
 </template>
@@ -85,6 +85,9 @@
 						console.log('请求失败'+err);
 					}
 				)
+			},
+			btnBack(){ //按钮返回
+				window.history.back();
 			}
 		}
 	}

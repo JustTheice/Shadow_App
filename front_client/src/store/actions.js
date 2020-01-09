@@ -23,7 +23,6 @@ export default {
 		commit('UPDATE_SIZE', {newV})
 	},
 	"SOCKET_chat message"({commit}, item) { //更新聊天室消息记录
-		console.log(item);
 		commit('UPDATE_CHAT_MSG',{item});
 	}
 }

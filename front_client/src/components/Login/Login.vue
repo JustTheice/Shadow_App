@@ -1,6 +1,6 @@
 <template>
 	<section id="login" ref="wrap">
-		<div class="back iconfont icon-back" @touchend="shows.login=false">
+		<div class="back iconfont icon-back" @touchend="btnBack()">
 		</div>
 		<div id="container">
 			<div class="type">
@@ -14,15 +14,15 @@
 				<mt-field label="验证码" placeholder="不分大小写" type="text" v-model="pwdData.imgCode">
 					<img :src="imgCodeSrc" alt="验证码" class="img-code" @touchstart="getImgCode"/>
 				</mt-field>
-				<mt-button type="primary" size="large" @touchend="login()">注册/登录</mt-button>
+				<mt-button type="primary" size="large" @touchend.native="login()">注册/登录</mt-button>
 			</div>
 			<div class="phone" v-show="type=='phone'">
 				<mt-field label="手机号" placeholder="仅支持中国大陆" type="tel" v-model="phoneData.phone">
-					<mt-button type="primary" size="small" @touchend.native="getPhoneCode" v-show="!codeCount">获取</mt-button>
+					<mt-button type="primary" size="small" @touchend.prevent.native="getPhoneCode" v-show="!codeCount">获取</mt-button>
 					<span v-show="codeCount">{{codeCount}}s</span>
 				</mt-field>
 				<mt-field label="验证码" placeholder="短信验证码" type="password" v-model="phoneData.phoneCode"></mt-field>
-				<mt-button type="primary" size="large" @touchend="login">注册/登录</mt-button>
+				<mt-button type="primary" size="large" @touchend.prevent.native="login">注册/登录</mt-button>
 			</div>
 			<div class="instruction">
 				<p>如果账号已注册则登录，如果未注册则注册，请牢记密码，丢失暂不可找回</p>
@@ -125,6 +125,9 @@
 				}, 1000);
 			},
 		
+			btnBack(){
+				window.history.back();
+			}
 		}
 	}
 </script>
