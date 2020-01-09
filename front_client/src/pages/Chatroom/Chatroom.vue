@@ -11,7 +11,7 @@
 		</div>
 		<div class="chatbox">
 			<div class="content" ref="content">
-				<ul>
+				<ul id="msgUl">
 					<li v-for="(msg,index) in chatMsgs" :class="msg.name==$store.state.userInfo.name?'self':'others'" :key="index">
 						<img src="./img/avatar.png" alt="头像">
 						<div>
@@ -47,6 +47,7 @@
 		data(){
 			return {
 				chatMsg: '',
+				msgScroll: {}
 			}
 		},
 		mounted() {
@@ -55,7 +56,7 @@
 				this.initH();
 			};
 			
-			new BScroll(this.$refs.content, {
+			this.msgScroll = new BScroll(this.$refs.content, {
 				scrollY: true,
 				scrollX: false,
 				click: true,
@@ -66,7 +67,20 @@
 		computed: {
 			...mapState(['settings','chatMsgs'])
 		},
-		
+		watch: {
+			chatMsgs: {
+				deep: true,
+				handler(v){
+					if(this.msgScroll.y<=this.msgScroll.maxScrollY){
+						this.$nextTick(() => {
+							this.msgScroll.refresh()
+							this.msgScroll.scrollTo(0, this.msgScroll.maxScrollY, 200)
+						});
+					}
+					
+				}
+			}
+		},
 		methods: {
 			initH(){ //动态设置高度
 				let scale = document.documentElement.clientWidth/16;
@@ -148,6 +162,7 @@
 								}
 								&.msg{
 									clear: both;
+									word-break: break-all;
 									margin-top: .2rem;
 									padding: .3rem;
 									border-radius: .2rem;

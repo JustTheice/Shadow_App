@@ -22,6 +22,7 @@ function getImgCode (req, res) {
 		console.log(req.session);
 		res.type('svg');
     res.send(captcha.data);
+		console.log(captcha.data)
 }
 
 

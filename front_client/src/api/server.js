@@ -1,6 +1,7 @@
 let baseUrl_api = '/server';
 import ajax from './ajax.js';
-let baseUrl_Server = 'http://192.168.2.104:5000';
+// let baseUrl_Server = 'http://192.168.2.104:5000';
+let baseUrl_Server = 'http://127.0.0.1:5000';
 
 export const reqPhoneCode = (phone) => ajax(baseUrl_Server+'/getPhoneCode', {phone}, 'get', { withCredentials: true});
 export const reqLogin = (sendData) => ajax(baseUrl_Server+'/login', sendData, 'POST', { withCredentials: true});

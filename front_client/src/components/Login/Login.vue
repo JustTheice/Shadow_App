@@ -54,7 +54,7 @@
 					imgCode: '',
 					phoneCode: ''
 				},
-				imgCodeSrc: 'http://192.168.2.104:5000/getImgCode?'+Date.now(),
+				imgCodeSrc: 'http://127.0.0.1:5000/getImgCode?'+Date.now(),
 				codeCount: 0
 			}
 		},

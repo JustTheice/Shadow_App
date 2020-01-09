@@ -1,13 +1,14 @@
 <template>
-	<section id="drawsth" ref="wrap" :style="{height: wrapH}">
+	<section id="drawsth" ref="wrap">
 		<div class="top" ref="top">
-			<div class="iconfont icon-back back"></div>
+			<div class="iconfont icon-back back" @click="$router.back"></div>
 			<h3 @click="showPlayers=!showPlayers">你画我猜</h3>
 		</div>
 		<div class="players" ref="players" :style="{height: showPlayers?'5rem':0}">
 			<div class="player-item">
 				<img src="./img/avatar.png" alt="玩家">
 				<p>哇哈哈哈哈哈哈</p>
+				<span>10</span>
 			</div>
 			<div class="player-item">
 				<img src="./img/avatar.png" alt="玩家">
@@ -36,11 +37,15 @@
 		<div class="draw-content" ref="content">
 			<div class="tools" ref="tools">
 				<div class="left">
-					<button class="pencil"></button>
-					<button class="eraser"></button>
+					<button class="pencil" :class="{active: type===0}" @click="type=0"></button>
+					<button class="eraser" :class="{active: type===1}" @click="type=1"></button>
 				</div>
 				<div class="tip">
 					你要画的是: 脑残
+				</div>
+				<div class="right">
+					<button class="line"></button>
+					<button class="color"></button>
 				</div>
 			</div>
 			<canvas ref="canvas"></canvas>
@@ -71,24 +76,29 @@
 			canvas.width = tools.clientWidth;
 			canvas.height = tools.clientWidth;
 			
-			this.msgboxH = (this.allH-content.offsetHeight-players.offsetHeight-control.offsetHeight-top.offsetHeight) + 'px';
-			
+			msgbox.style.height = (wrap.offsetHeight-content.offsetHeight-players.offsetHeight-control.offsetHeight-top.offsetHeight) + 'px';
+			this.pH = players.offsetHeight;
 			window.onresize = () => {
-				this.wrapH = document.documentElement.clientHeight;
+				wrap.style.height = document.documentElement.clientHeight;
 			};
 			
 		},
 		data(){
 			return {
 				allH: document.documentElement.clientHeight,
-				wrapH: document.documentElement.clientHeight,
 				showPlayers: true,
+				pH: 0,
+				type: 0
 			}
 		},
 		watch: {
-			// showPlayers(newV){
-			// 	msgbox.style.height = (this.wrapH-content.offsetHeight-players.offsetHeight-control.offsetHeight-top.offsetHeight) + 'px';
-			// }
+			showPlayers(newV){
+				let playersH = 0;
+				if(newV){
+					playersH = this.pH;
+				}
+				this.$refs.msgbox.style.height = (this.allH-this.$refs.content.offsetHeight-playersH-this.$refs.control.offsetHeight-this.$refs.top.offsetHeight) + 'px';
+			}
 		}
 	}
 </script>
@@ -122,7 +132,7 @@
 			transition: .2s;
 			display: flex;
 			height: 5rem;
-			background: green;
+			background: whitesmoke;
 			justify-content: space-around;
 			flex-wrap: wrap;
 			overflow: hidden;
@@ -131,6 +141,7 @@
 				box-sizing: border-box;
 				padding: 0 .2rem;
 				height: 2.5rem;
+				position: relative;
 				img{
 					width: 100%;
 				}
@@ -141,6 +152,19 @@
 					font-size: .3rem;
 					white-space: nowrap;
 					text-overflow: ellipsis;
+				}
+				span{
+					top: 0;
+					left: 50%;
+					transform: translateX(-50%);
+					position: absolute;
+					width: .7rem;
+					height: .7rem;
+					border-radius: 50%;
+					background: orangered;
+					font-size: .5rem;
+					line-height: .7rem;
+					text-align: center;
 				}
 			}
 		}
@@ -157,7 +181,10 @@
 			.tools{
 				position: relative;
 				height: 1rem;
-				.left{
+				.left,.right{
+					height: 1rem;
+					float: left;
+					width: 50%;
 					button{
 						display: inline-block;
 						border: 0;
@@ -166,12 +193,28 @@
 						width: 1rem;
 						height: 1rem;
 						background-size: 100% 100% !important;
-						&.pencil{
-							background: url(./img/pencil.png);
+						
+						&.active{
+							background-color: rgba(255,255,255,.5);
 						}
-						&.eraser{
-							background: url(./img/eraser.png);
-						}
+					}
+				}
+				.left{
+					.pencil{
+						background: url(./img/pencil.png);
+					}
+					.eraser{
+						background: url(./img/eraser.png);
+					}	
+				}
+				.right{
+					float: right;
+					text-align: right;
+					.color{
+						background: url(./img/color.png);
+					}
+					.line{
+						background: url(img/line.png);
 					}
 				}
 				.tip{
@@ -194,6 +237,7 @@
 			background: skyblue;
 			box-sizing: border-box;
 			padding: .2rem .5rem;
+			transition: .2s;
 			ul{
 				background: white;
 				li{
