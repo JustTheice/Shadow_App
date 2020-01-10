@@ -51,24 +51,24 @@
 					你要画的是: 脑残
 				</div>
 				<div class="right">
-					<button class="line" @click="shows.lineControl=!shows.lineControl"></button>
-					<button class="color" @click="shows.colorControl=!shows.colorControl"></button>
+					<button class="line" @click="toggleRight('lineControl')"></button>
+					<button class="color" @click="toggleRight('colorControl')"></button>
 				</div>
 				<div class="color-control" v-show="shows.colorControl">
-					<div></div>
-					<div></div>
-					<div></div>
-					<div></div>
-					<div></div>
-					<div></div>
-					<div></div>
+					<div @touchstart="changeColor('red')"></div>
+					<div @touchstart="changeColor('orange')"></div>
+					<div @touchstart="changeColor('yellow')"></div>
+					<div @touchstart="changeColor('limegreen')"></div>
+					<div @touchstart="changeColor('rgb(0,230,190)')"></div>
+					<div @touchstart="changeColor('deepskyblue')"></div>
+					<div @touchstart="changeColor('mediumpurple')"></div>
 				</div>
 				<div class="line-control" v-show="shows.lineControl">
-					<div><span></span></div>
-					<div><span></span></div>
-					<div><span></span></div>
-					<div><span></span></div>
-					<div><span></span></div>
+					<div @touchstart="changeLine(1)"><span></span></div>
+					<div @touchstart="changeLine(2)"><span></span></div>
+					<div @touchstart="changeLine(3)"><span></span></div>
+					<div @touchstart="changeLine(4)"><span></span></div>
+					<div @touchstart="changeLine(5)"><span></span></div>
 				</div>
 			</div>
 			<canvas ref="canvas"></canvas>
@@ -119,7 +119,10 @@
 				shows: {
 					colorControl: false,
 					lineControl: false
-				}
+				},
+				line: 2,
+				color: 'red',
+				scale: document.documentElement.clientWidth/16,
 			}
 		},
 		watch: {
@@ -129,6 +132,35 @@
 					playersH = this.pH;
 				}
 				this.$refs.msgbox.style.height = (this.allH-this.$refs.content.offsetHeight-playersH-this.$refs.control.offsetHeight-this.$refs.top.offsetHeight) + 'px';
+			}
+		},
+		methods: {
+			toggleRight(type){ //切换右侧工具栏的显示隐藏
+				type === 'colorControl' ? (this.shows.lineControl=false) : (this.shows.colorControl=false);
+				this.shows[type] = !this.shows[type];
+			},
+			canvasInit(){
+				let canvas = this.$refs.canvas;
+				if(canvas.getContext){
+					this.ctx = canvas.getContext('2d');
+				}
+				let {ctx, color, line} = this;
+				ctx.lineCap = 'round';
+				ctx.lineWidth = line;
+				ctx.strokeStyle = color;
+				canvas.addEventListener('touchstart', function(ev){
+					ctx.save();
+					ctx.beginPath();
+					
+					ctx.restore();
+				});
+			},
+			changeLine(lv){ //更新线宽
+				let {scale, line} = this;
+				this.line = lv*scale*0.2;
+			},
+			changeColor(color){ //更新颜色
+				this.color = color;
 			}
 		}
 	}
@@ -385,6 +417,7 @@
 			padding: .2rem .5rem;
 			transition: .2s;
 			ul{
+				min-height: 100%;
 				background: white;
 				li{
 					padding: 0 .2rem;
@@ -405,6 +438,10 @@
 			height: 1.5rem;
 			input{
 				display: inline-block;
+				box-sizing: border-box;
+				padding: .2rem;
+				font-size: .8rem;
+				line-height: 1.2rem;
 				width: 12rem;
 				height: 1.2rem;
 				// vertical-align: middle;
