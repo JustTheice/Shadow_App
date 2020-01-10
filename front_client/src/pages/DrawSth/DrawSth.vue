@@ -9,29 +9,36 @@
 				<img src="./img/avatar.png" alt="玩家">
 				<p>哇哈哈哈哈哈哈</p>
 				<span>10</span>
+				<div class="mask">+4</div>
 			</div>
 			<div class="player-item">
 				<img src="./img/avatar.png" alt="玩家">
 				<p>哇哈哈哈哈哈哈</p>
-			</div>
-			<div class="player-item">
-				<img src="./img/avatar.png" alt="玩家">
-				<p>哇哈哈哈哈哈哈</p>
-			</div>
-			<div class="player-item">
-				<img src="./img/avatar.png" alt="玩家">
-				<p>哇哈哈哈哈哈哈</p>
-			</div>
-			<div class="player-item">
-				<img src="./img/avatar.png" alt="玩家">
-				<p>哇哈哈哈哈哈哈</p>
+				<span>10</span>
 			</div><div class="player-item">
 				<img src="./img/avatar.png" alt="玩家">
 				<p>哇哈哈哈哈哈哈</p>
-			</div>
-			<div class="player-item">
+				<span>10</span>
+			</div><div class="player-item">
 				<img src="./img/avatar.png" alt="玩家">
 				<p>哇哈哈哈哈哈哈</p>
+				<span>10</span>
+			</div><div class="player-item">
+				<img src="./img/avatar.png" alt="玩家">
+				<p>哇哈哈哈哈哈哈</p>
+				<span>10</span>
+			</div><div class="player-item">
+				<img src="./img/avatar.png" alt="玩家">
+				<p>哇哈哈哈哈哈哈</p>
+				<span>10</span>
+			</div><div class="player-item">
+				<img src="./img/avatar.png" alt="玩家">
+				<p>哇哈哈哈哈哈哈</p>
+				<span>10</span>
+			</div><div class="player-item">
+				<img src="./img/avatar.png" alt="玩家">
+				<p>哇哈哈哈哈哈哈</p>
+				<span>10</span>
 			</div>
 		</div>
 		<div class="draw-content" ref="content">
@@ -44,8 +51,24 @@
 					你要画的是: 脑残
 				</div>
 				<div class="right">
-					<button class="line"></button>
-					<button class="color"></button>
+					<button class="line" @click="shows.lineControl=!shows.lineControl"></button>
+					<button class="color" @click="shows.colorControl=!shows.colorControl"></button>
+				</div>
+				<div class="color-control" v-show="shows.colorControl">
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+					<div></div>
+				</div>
+				<div class="line-control" v-show="shows.lineControl">
+					<div><span></span></div>
+					<div><span></span></div>
+					<div><span></span></div>
+					<div><span></span></div>
+					<div><span></span></div>
 				</div>
 			</div>
 			<canvas ref="canvas"></canvas>
@@ -58,6 +81,10 @@
 		<div class="control" ref="control">
 			<input type="text">
 			<mt-button type="primary">发送</mt-button>
+		</div>
+		<div class="turn-mask">
+			<p class="your">你的回合</p>
+			<p class="title">请画：<span>脑残</span></p>
 		</div>
 	</section>
 </template>
@@ -88,7 +115,11 @@
 				allH: document.documentElement.clientHeight,
 				showPlayers: true,
 				pH: 0,
-				type: 0
+				type: 0,
+				shows: {
+					colorControl: false,
+					lineControl: false
+				}
 			}
 		},
 		watch: {
@@ -104,6 +135,7 @@
 </script>
 
 <style lang="less">
+	@import '../../../static/css/mixin.less';
 	#drawsth{
 		width: 100%;
 		height: 100%;
@@ -154,19 +186,35 @@
 					text-overflow: ellipsis;
 				}
 				span{
-					top: 0;
-					left: 50%;
-					transform: translateX(-50%);
+					top: 50%;
+					right: 0;
+					transform: translateY(-50%);
 					position: absolute;
-					width: .7rem;
-					height: .7rem;
+					width: .8rem;
+					height: .8rem;
 					border-radius: 50%;
-					background: orangered;
-					font-size: .5rem;
-					line-height: .7rem;
+					background: deepskyblue;
+					font-size: .6rem;
+					line-height: .8rem;
 					text-align: center;
+					color: white;
+					z-index: 99;
 				}
 			}
+				.mask{
+					position: absolute;
+					background: rgba(25,25,25,.8);
+					width: 2.1rem;
+					height: 2.1rem;
+					top: 0;
+					z-index: 10;
+					text-align: center;
+					line-height: 2.1rem;
+					font-size: .8rem;
+					left:.2rem;
+					color: white;
+					border-radius: 50%;
+				}
 		}
 		.draw-content{
 			width: 16rem;
@@ -229,6 +277,104 @@
 					background: orange;
 					text-align: center;
 				}
+				.color-control{
+					position: absolute;
+					box-sizing: border-box;
+					top: 1rem;
+					display: flex;
+					border-radius: 0 0 .5rem .5rem;
+					right: 0rem;
+					width: 12rem;
+					height: 2rem;
+					background: rgba(233,233,233,.7);
+					justify-content: space-around;
+					align-items: center;
+					>div{
+						box-sizing: border-box;
+						width: 1.4rem;
+						height: 1.4rem;
+						border-radius: 50%;
+						&:nth-child(1){
+							background: red;
+						}
+						&:nth-child(2){
+							background: orange;
+						}
+						&:nth-child(3){
+							background: yellow;
+						}
+						&:nth-child(4){
+							background: limegreen;
+						}
+						&:nth-child(5){
+							background: rgb(0,230,190);
+						}
+						&:nth-child(6){
+							background: deepskyblue;
+						}
+						&:nth-child(7){
+							background: mediumpurple;
+						}
+					}
+				}
+				.line-control{
+					position: absolute;
+					box-sizing: border-box;
+					top: 1rem;
+					display: flex;
+					justify-content: space-around;
+					align-items: center;
+					border-radius: 0 0 .5rem .5rem;
+					right: 1rem;
+					width: 10rem;
+					height: 2rem;
+					background: rgba(233,233,233,.7);
+					>div{
+						width: 1.5rem;
+						height: 1.5rem;
+						position: relative;
+						>span{
+							display: inline-block;
+							position: absolute;
+							top: 50%;
+							left: 50%;
+							transform: translate(-50%,-50%);
+							border-radius: 50%;
+							background: black;
+						}
+						&:nth-child(1){
+							>span{
+								width: 0.2rem;
+								height: 0.2rem;
+							}
+						}
+						&:nth-child(2){
+							>span{
+								width: 0.4rem;
+								height: 0.4rem;
+							}
+						}
+						&:nth-child(3){
+							>span{
+								width: 0.6rem;
+								height: 0.6rem;
+							}
+						}
+						&:nth-child(4){
+							>span{
+								width: 0.8rem;
+								height: 0.8rem;
+							}
+						}
+						&:nth-child(5){
+							>span{
+								width: 1rem;
+								height: 1rem;
+							}
+						}
+					}
+				}
+				
 			}
 			
 		}
@@ -271,6 +417,30 @@
 				text-align: center;
 				font-size: .7rem;
 				transform: translateY(0.03rem);
+			}
+		}
+		.turn-mask{
+			width: 9rem;
+			height: 6rem;
+			background: url(./img/turn.png);
+			background-size: 100% 100%;
+			position: absolute;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%,-50%);
+			color: rgb(25,25,25);
+			display: none;
+			.your{
+				padding-top: 1.5rem;
+				font-size: .8rem;
+				text-align: center;
+			}
+			.title{
+				padding-top: .5rem;
+				text-align: center;
+				span{
+					color: orangered;
+				}
 			}
 		}
 	}
