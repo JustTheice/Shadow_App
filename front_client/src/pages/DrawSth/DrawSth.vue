@@ -19,7 +19,7 @@
 					<button class="eraser" :class="{active: type===1}" @click="type=1"></button>
 				</div>
 				<div class="tip">
-					你要画的是: 脑残
+					{{painter==userInfo.name ? '你要画的是:'+title : `请欣赏${painter}的杰作`}}
 				</div>
 				<div class="right">
 					<button class="line" @click="toggleRight('lineControl')"></button>
@@ -58,7 +58,7 @@
 		</div>
 		<div class="turn-mask">
 			<p class="your">你的回合</p>
-			<p class="title">请画：<span>脑残</span></p>
+			<p class="title">请画：<span>{{title}}</span></p>
 		</div>
 	</section>
 </template>
@@ -110,7 +110,9 @@
 				},
 				players: [
 					
-				]
+				],
+				title: '',
+				painter: ''
 			}
 		},
 		computed: {
@@ -216,6 +218,12 @@
 				//开始倒计时
 				this.sockets.subscribe('willStart', ({msg}) => {
 					this.msgs.push(msg)
+				});
+				//
+				this.sockets.subscribe('turnPainter', ({name, title}) => {
+					this.painter = name;
+					this.title = title;
+					this.msgs.push({content: `现在由${name}绘画`});
 				});
 			},
 			changeLine(lv){ //更新线宽

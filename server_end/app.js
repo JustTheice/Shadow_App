@@ -85,17 +85,14 @@ io.on('connection', function(socket){
 		}
 		io.to(DRAW_ROOM).emit('joinDrawRoom', {msg:{name:'',content:`欢迎${name}加入了房间`}, players});
 		
-		if(inRooms.length >= 2){ //开始倒计时
-			startCount = 5;
+		if(inRooms.length>=2 && !isPlaying){ //开始倒计时
 			io.to(DRAW_ROOM).emit('willStart', {msg: {name:'',content:'如果不来人的话5秒后就开始了'}});
-			startTimer = setInterval(() => {
-				startCount--;
-				if(startCount<=0){
-					clearInterval(startTimer);
-					//开始游戏
-					// '...'
-				}
-			},1000);
+			clearTimeout(startTimer);
+			startTimer = setTimeout(() => {
+				//开始游戏
+				isPlaying = true;
+				turnLogic();
+			},5000);
 		}
 	});
 	socket.on('startDraw', function(point){
@@ -140,28 +137,38 @@ function turnLogic(){
 	 * 		3.本回合结束后递归进入下一个回合
 	 * 		4.全部回合结束后,清空玩家列表
 	 */
-		
-	//发送画者信息
-	io.to(DRAW_ROOM).emit('turnPainter', players[turnIndex].name);
 	
-	setInterval(() => {
+	//判断游戏是否结束
+	if(turnIndex>players.length-1){
+		isPlaying = false;
+		io.to(DRAW_ROOM).emit('turnOver', {msg: '游戏结束了'});
+		turnIndex = 0;
+		players = [];
+		console.log('游戏结束');
+		return
+	}
+	
+	turnCount = 10;
+	console.log(turnIndex+'回合')
+	//发送画者信息
+	io.to(DRAW_ROOM).emit('turnPainter', {name:players[turnIndex].name, title: '脑残'});
+	
+	turnTimer = setInterval(() => {
 		turnCount--;
 		io.to(DRAW_ROOM).emit('turnCount', {turnCount});
 		if(turnCount>0 && turnCount<=5){ //一定时间后发送提示
 			io.to(DRAW_ROOM).emit('turnTip', {turnTip});
 		}else if(turnCount<=0){ //回合结束
 			clearInterval(turnTimer);
+			turnIndex++;
+			console.log('即将进入下一回合')
 			setTimeout(() => {
 				turnLogic();
 			}, 5000);
-	 }
+		}
 	},1000);
 	
-	//游戏结束时
-	if(turnIndex===players.length-1){
-		return players = [];
-		io.to(DRAW_ROOM).emit('turnOver', {msg: '游戏结束了'});
-	}
+	
 }
 
 
