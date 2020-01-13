@@ -64,13 +64,106 @@ app.use(helmet({
 
 
 //socket服务
+let players = [], inRooms = [];
+let isPlaying = false;
+let startTimer, startCount; //开始游戏倒计时
+let turnTimer, turnAnswer, turnTip, turnCount = 10, turnIndex=0; //回合相关
+const DRAW_ROOM = 'DRAW_ROOM';
 io.on('connection', function(socket){
 	console.log('一个用户连接到了socket');
 	socket.on('chat message', function(msg){
 		console.log(msg)
 		io.emit('chat message', msg);
 	});
-})
+	socket.on('joinDrawRoom', function({name,id}){
+		socket.join(DRAW_ROOM);
+		//记录到inRooms
+		inRooms.push({name, score:0});
+		//记录到players
+		if(!isPlaying){ 
+			players.push({name, score:0});
+		}
+		io.to(DRAW_ROOM).emit('joinDrawRoom', {msg:{name:'',content:`欢迎${name}加入了房间`}, players});
+		
+		if(inRooms.length >= 2){ //开始倒计时
+			startCount = 5;
+			io.to(DRAW_ROOM).emit('willStart', {msg: {name:'',content:'如果不来人的话5秒后就开始了'}});
+			startTimer = setInterval(() => {
+				startCount--;
+				if(startCount<=0){
+					clearInterval(startTimer);
+					//开始游戏
+					// '...'
+				}
+			},1000);
+		}
+	});
+	socket.on('startDraw', function(point){
+		io.to(DRAW_ROOM).emit('startDraw', point);
+	});
+	socket.on('moveDraw', function(point){
+		io.to(DRAW_ROOM).emit('moveDraw', point);
+		// .broadcast
+	});
+	socket.on('toggleType', function({type}){
+		io.to(DRAW_ROOM).emit('toggleType', {type});
+	});
+	socket.on('changeColor', function({color}){
+		io.to(DRAW_ROOM).emit('changeColor', {color});
+	});
+	socket.on('changeLine', function({line}){
+		io.to(DRAW_ROOM).emit('changeLine', {line});
+	});
+});
+/**
+ * 		你画我猜,逻辑分析:
+ * 			1.房间内的所有玩家记录在一个数组中
+ * 			2.判断 * 人数必须>=2才能开始
+ * 			3.当最后一个用户进入或某个用户离开5s后开始游戏  (根据前端发来的进入/离开事件来判断)
+ * 			4.游戏开始后,后进来的用户只能观看		(加入房间但不存入玩家数组)
+ * 			5.对players中的玩家轮流发送绘画回合,并随机生成要猜的词		
+ * 			6.隔一段时间后向客户端发送提示
+ * 			7.收到玩家消息后判断答案,对了则显示其答对并计算加分
+ * 			8.每回合结束后公示答案
+ * 			9.游戏结束后返回排行榜
+ * 			10.结束后隔30s后开始
+ */
+
+/**
+ * 		回合框架
+ * 		@param index 玩家数组中玩家所在下标
+ */
+function turnLogic(){ 
+	/**
+	 * 		1.向客户端发送画者信息
+	 * 		2.每秒更新回合剩余时长
+	 * 		3.本回合结束后递归进入下一个回合
+	 * 		4.全部回合结束后,清空玩家列表
+	 */
+		
+	//发送画者信息
+	io.to(DRAW_ROOM).emit('turnPainter', players[turnIndex].name);
+	
+	setInterval(() => {
+		turnCount--;
+		io.to(DRAW_ROOM).emit('turnCount', {turnCount});
+		if(turnCount>0 && turnCount<=5){ //一定时间后发送提示
+			io.to(DRAW_ROOM).emit('turnTip', {turnTip});
+		}else if(turnCount<=0){ //回合结束
+			clearInterval(turnTimer);
+			setTimeout(() => {
+				turnLogic();
+			}, 5000);
+	 }
+	},1000);
+	
+	//游戏结束时
+	if(turnIndex===players.length-1){
+		return players = [];
+		io.to(DRAW_ROOM).emit('turnOver', {msg: '游戏结束了'});
+	}
+}
+
 
 server.listen(5000, () => {
 	console.log('server is running...');
