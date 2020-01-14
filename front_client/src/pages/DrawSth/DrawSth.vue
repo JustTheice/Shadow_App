@@ -122,6 +122,8 @@
 				canvasInfo: {
 					cL: 0,
 					cT: 0,
+					cW: 0,
+					cH: 0
 				},
 				players: [],
 				title: '',
@@ -181,6 +183,8 @@
 				ctx.lineWidth = line;
 				ctx.strokeStyle = color;
 				
+				canvasInfo.cW = canvas.clientWidth;
+				canvasInfo.cH = canvas.clientHeight;
 				canvasInfo.cL = canvas.offsetLeft;
 				canvasInfo.cT = canvas.offsetTop;
 				//手指按下
@@ -253,6 +257,7 @@
 				});
 				//每回合开始
 				this.sockets.subscribe('turnPainter', ({name, title}) => {
+					this.ctx.clearRect(0,0,this.canvasInfo.cW,this.canvasInfo.cH)
 					this.title = title;
 					this.tip = '';
 					this.painter = name;
@@ -290,12 +295,12 @@
 				});
 				//游戏结束
 				this.sockets.subscribe('gameOver', ({rank}) => {
-					console.log(rank)
 					this.isPlaying = false;
 					this.isOver = true;
 					this.rank = rank;
 					setTimeout(() => {
 						this.isOver = false;
+						this.ctx.clearRect(0,0,this.canvasInfo.cW,this.canvasInfo.cH)
 					},5000);
 				});
 			},

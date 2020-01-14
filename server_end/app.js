@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const proxyMiddleWare = require("http-proxy-middleware");
 const app = express();
 const helmet = require('helmet');
@@ -64,10 +65,17 @@ app.use(helmet({
 
 
 //socket服务
+let riddles = [];
+fs.readFile('./data/riddles.json', 'utf8', function(err, data){
+  if(err){
+		return console.log('读取失败'+err);
+	}
+	riddles = JSON.parse(data);
+});
 let players = [], inRooms = [];
 let isPlaying = false;
 let startTimer, startCount; //开始游戏倒计时
-let turnTimer, turnAnswer='脑残', turnTip='老弟', turnCount = 10, turnIndex=0; //回合相关
+let turnTimer, turnAnswer='', turnTip='', turnCount = 10, turnIndex=0; //回合相关
 const DRAW_ROOM = 'DRAW_ROOM';
 io.on('connection', function(socket){
 	console.log('一个用户连接到了socket');
@@ -198,7 +206,25 @@ function turnLogic(){
 	}
 	
 	//回合初始化
-	turnAnswer = '脑残';
+	turnTip = '';
+	let type = Math.round(Math.random()*5);
+	switch (type){
+		case 0: turnTip = '成语';
+			break;
+		case 1: turnTip = '明星';
+			break;
+		case 2: turnTip = '水果';
+			break;
+		case 3: turnTip = '动物';
+			break;
+		case 4: turnTip = '武器';
+			break;
+		default:
+			break;
+	}
+	let riddleGroup = riddles[type];
+	let riddleIndex = Math.round(Math.random()*riddleGroup.length);
+	turnAnswer = riddleGroup[riddleIndex];
 	turnCount = 10;
 	players.forEach((item,index) => {
 		item.addScore = 0;
