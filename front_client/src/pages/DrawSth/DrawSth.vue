@@ -9,7 +9,7 @@
 				<img src="./img/avatar.png" alt="玩家">
 				<p>{{player.name}}</p>
 				<span>{{player.score}}</span>
-				<div class="mask">+4</div>
+				<div class="mask" v-show="player.addScore">+{{player.addScore}}</div>
 			</div>
 		</div>
 		<div class="draw-content" ref="content">
@@ -19,7 +19,8 @@
 					<button class="eraser" :class="{active: type===1}" @click="type=1"></button>
 				</div>
 				<div class="tip">
-					{{painter==userInfo.name ? '你要画的是:'+title : `请欣赏${painter}的杰作`}}
+					<!-- {{painter==userInfo.name ? '你要画的是:'+title : `${answer.length} ${tip}`}} -->
+					{{`提示:${title.length}个字 ${tip}`}}
 				</div>
 				<div class="right">
 					<button class="line" @click="toggleRight('lineControl')"></button>
@@ -53,12 +54,26 @@
 			</ul>
 		</div>
 		<div class="control" ref="control">
-			<input type="text">
-			<mt-button type="primary">发送</mt-button>
+			<input type="text" v-model="answer">
+			<mt-button type="primary" @click="sendAnswer">发送</mt-button>
 		</div>
-		<div class="turn-mask">
-			<p class="your">你的回合</p>
-			<p class="title">请画：<span>{{title}}</span></p>
+		<div class="turn-mask" v-show="showMask" @click="showMask=false">
+			<p class="your" v-show="painter==userInfo.name">你的回合</p>
+			<p class="your" v-show="painter!=userInfo.name">游戏结束</p>
+			<p class="title" v-show="painter==userInfo.name">请画：<span>{{title}}</span></p>
+			<p class="title" v-show="painter!=userInfo.name">答案是：<span>{{title}}</span></p>
+		</div>
+		<div class="rank" v-show="isOver">
+			<ul>
+				<li v-for="(player,index) in rank" :key="index">
+					<div class="left">
+						<strong>{{index+1}}</strong>
+						<img src="./img/avatar.png" alt="头像">
+						<span>{{player.name}}</span>
+					</div>
+					<span class="right">{{player.score}}</span>
+				</li>
+			</ul>
 		</div>
 	</section>
 </template>
@@ -108,11 +123,15 @@
 					cL: 0,
 					cT: 0,
 				},
-				players: [
-					
-				],
+				players: [],
 				title: '',
-				painter: ''
+				painter: '',
+				tip: '',
+				answer: '',
+				showMask: false,
+				isPlaying: false,
+				isOver: false,
+				rank: []
 			}
 		},
 		computed: {
@@ -128,6 +147,19 @@
 			},
 			type(newV){ //切换画笔/橡皮
 				this.$socket.emit('toggleType', {type:newV});
+			},
+			msgs: {
+				deep: true,
+				handler(newV){
+					this.$nextTick(() => {
+						let msgbox = this.$refs.msgbox;
+						let maxL = Math.floor(msgbox.clientHeight/msgbox.querySelector('li').offsetHeight);
+						if(newV.length>maxL){
+							this.msgs.splice(0,1);
+						}
+					})
+					
+				}
 			}
 		},
 		methods: {
@@ -219,11 +251,52 @@
 				this.sockets.subscribe('willStart', ({msg}) => {
 					this.msgs.push(msg)
 				});
-				//
+				//每回合开始
 				this.sockets.subscribe('turnPainter', ({name, title}) => {
-					this.painter = name;
 					this.title = title;
+					this.tip = '';
+					this.painter = name;
+					this.showMask = false;
+					if(name===this.userInfo.name){
+						this.showMask = true;
+					}
+					
 					this.msgs.push({content: `现在由${name}绘画`});
+				});
+				//每回合结束
+				this.sockets.subscribe('turnOver', () => {
+					this.showMask = true;
+					this.painter = '';
+					setTimeout(() => {
+						this.players.forEach((item,index) => {
+							item.addScore = 0;
+						});
+					},3000);
+				});
+				//有人回答
+				this.sockets.subscribe('turnAnswer', ({name, addScore, msg}) => {
+					if(addScore){
+						var player = this.players.find((item,index) => {
+							return item.name == name;
+						});
+						player.addScore = addScore;
+						player.score += player.addScore;
+					}
+					this.msgs.push({content: msg, name});
+				});
+				//收到提示
+				this.sockets.subscribe('turnTip', ({turnTip}) => {
+					this.tip = turnTip;
+				});
+				//游戏结束
+				this.sockets.subscribe('gameOver', ({rank}) => {
+					console.log(rank)
+					this.isPlaying = false;
+					this.isOver = true;
+					this.rank = rank;
+					setTimeout(() => {
+						this.isOver = false;
+					},5000);
 				});
 			},
 			changeLine(lv){ //更新线宽
@@ -231,6 +304,11 @@
 			},
 			changeColor(color){ //更新颜色
 				this.$socket.emit('changeColor', {color});
+			},
+			sendAnswer(){
+				let {userInfo, answer} = this;
+				console.log(userInfo)
+				this.$socket.emit('turnAnswer', {answer, name:userInfo.name});
 			},
 			startDraw(x,y, cb){
 				let {ctx} = this;
@@ -389,7 +467,7 @@
 					width: auto;
 					height: 1rem;
 					line-height: 1rem;
-					font-size: .8rem;
+					font-size: .7rem;
 					background: orange;
 					text-align: center;
 				}
@@ -553,7 +631,6 @@
 			left: 50%;
 			transform: translate(-50%,-50%);
 			color: rgb(25,25,25);
-			display: none;
 			.your{
 				padding-top: 1.5rem;
 				font-size: .8rem;
@@ -564,6 +641,44 @@
 				text-align: center;
 				span{
 					color: orangered;
+				}
+			}
+		}
+		.rank{
+			background: rgba(255,255,180,.8);
+			width: 13rem;
+			height: 20rem;
+			position: absolute;
+			top: 47%;
+			left: 50%;
+			transform: translate(-50%,-50%);
+			ul{
+				li{
+					height: 2rem;
+					padding-top: .2rem;
+					.left{
+						float: left;
+						height: 100%;
+						line-height: 2rem;
+						padding-left: .5rem;
+						strong,img,span{
+							display: inline-block;
+							padding: 0 .1rem;
+							vertical-align: middle;
+						}
+						strong{
+							color: orange;
+						}
+						img{
+							height: 100%;
+						}
+					}
+					.right{
+						vertical-align: middle;
+						float: right;
+						line-height: 2rem;
+						padding-right: .5rem;
+					}
 				}
 			}
 		}

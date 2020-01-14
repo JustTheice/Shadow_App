@@ -67,7 +67,7 @@ app.use(helmet({
 let players = [], inRooms = [];
 let isPlaying = false;
 let startTimer, startCount; //开始游戏倒计时
-let turnTimer, turnAnswer, turnTip, turnCount = 10, turnIndex=0; //回合相关
+let turnTimer, turnAnswer='脑残', turnTip='老弟', turnCount = 10, turnIndex=0; //回合相关
 const DRAW_ROOM = 'DRAW_ROOM';
 io.on('connection', function(socket){
 	console.log('一个用户连接到了socket');
@@ -78,10 +78,15 @@ io.on('connection', function(socket){
 	socket.on('joinDrawRoom', function({name,id}){
 		socket.join(DRAW_ROOM);
 		//记录到inRooms
+		// if(!inRooms.find((item,index) => {
+		// 	return item.name === name;
+		// })){
+		// 	inRooms.push({name, score:0});
+		// }
 		inRooms.push({name, score:0});
 		//记录到players
 		if(!isPlaying){ 
-			players.push({name, score:0});
+			players.push({name, score:0, addScore:0, hasTrue: false});
 		}
 		io.to(DRAW_ROOM).emit('joinDrawRoom', {msg:{name:'',content:`欢迎${name}加入了房间`}, players});
 		
@@ -90,6 +95,7 @@ io.on('connection', function(socket){
 			clearTimeout(startTimer);
 			startTimer = setTimeout(() => {
 				//开始游戏
+				players = inRooms;
 				isPlaying = true;
 				turnLogic();
 			},5000);
@@ -110,6 +116,37 @@ io.on('connection', function(socket){
 	});
 	socket.on('changeLine', function({line}){
 		io.to(DRAW_ROOM).emit('changeLine', {line});
+	});
+	socket.on('turnAnswer', function({answer, name}){
+		console.log(answer, name)
+		let retStr = '';
+		let isRight = true;
+		let addScore = 0;
+		//判断答案是否正确
+		for(let i=0; i<answer.length; i++){
+			console.log(answer[i])
+			//屏蔽关键词
+			if(turnAnswer.match(answer[i])){
+				retStr += '*';
+			}else{
+				retStr += answer[i];
+				isRight = false;
+			}
+		}
+		//答对加分
+		if(isRight && answer.length===turnAnswer.length){
+			var player = players.find((item,index) => {
+				return item.name == name;
+			});
+			if(!player.hasTrue){
+				addScore = 1;
+				player.addScore = 1;
+				player.score += player.addScore;
+				retStr = `${name}答对了`;
+				player.hasTrue = true;
+			}
+		}
+		io.to(DRAW_ROOM).emit('turnAnswer', {msg:retStr, addScore, name});
 	});
 });
 /**
@@ -141,14 +178,32 @@ function turnLogic(){
 	//判断游戏是否结束
 	if(turnIndex>players.length-1){
 		isPlaying = false;
-		io.to(DRAW_ROOM).emit('turnOver', {msg: '游戏结束了'});
+		let rank = players;
+		//分数排序
+		for (let i=0; i<rank.length-1; i++) { 
+			for (let j=0; j<rank.length-1-i; j++) {
+				if(rank[j].score < rank[j+1].score){
+					let t = rank[j];
+					rank[j] = rank[j+1];
+					rank[j+1] = t;
+				}
+			}
+		}
+		
+		io.to(DRAW_ROOM).emit('gameOver', {rank});
 		turnIndex = 0;
 		players = [];
 		console.log('游戏结束');
 		return
 	}
 	
+	//回合初始化
+	turnAnswer = '脑残';
 	turnCount = 10;
+	players.forEach((item,index) => {
+		item.addScore = 0;
+		item.hasTrue = false;
+	});
 	console.log(turnIndex+'回合')
 	//发送画者信息
 	io.to(DRAW_ROOM).emit('turnPainter', {name:players[turnIndex].name, title: '脑残'});
@@ -156,11 +211,12 @@ function turnLogic(){
 	turnTimer = setInterval(() => {
 		turnCount--;
 		io.to(DRAW_ROOM).emit('turnCount', {turnCount});
-		if(turnCount>0 && turnCount<=5){ //一定时间后发送提示
+		if(turnCount===6){ //一定时间后发送提示
 			io.to(DRAW_ROOM).emit('turnTip', {turnTip});
 		}else if(turnCount<=0){ //回合结束
 			clearInterval(turnTimer);
 			turnIndex++;
+			io.to(DRAW_ROOM).emit('turnOver', {});
 			console.log('即将进入下一回合')
 			setTimeout(() => {
 				turnLogic();
