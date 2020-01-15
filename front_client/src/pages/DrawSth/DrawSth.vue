@@ -62,7 +62,7 @@
 		</div>
 		<div class="turn-mask" v-show="showMask" @click="showMask=false">
 			<p class="your" v-show="painter==userInfo.name">你的回合</p>
-			<p class="your" v-show="painter!=userInfo.name">游戏结束</p>
+			<p class="your" v-show="painter!=userInfo.name">回合结束</p>
 			<p class="title" v-show="painter==userInfo.name">请画：<span>{{title}}</span></p>
 			<p class="title" v-show="painter!=userInfo.name">答案是：<span>{{title}}</span></p>
 		</div>
@@ -266,6 +266,7 @@
 				});
 				//每回合开始
 				this.sockets.subscribe('turnPainter', ({name, title}) => {
+					console.log(title)
 					this.ctx.clearRect(0,0,this.canvasInfo.cW,this.canvasInfo.cH)
 					this.title = title;
 					this.players.forEach((item,index) => {
@@ -309,6 +310,7 @@
 					this.rank = rank;
 					setTimeout(() => {
 						this.isOver = false;
+						this.showMask = false;
 						this.ctx.clearRect(0,0,this.canvasInfo.cW,this.canvasInfo.cH);
 						this.tip = '';
 						this.title = '';
@@ -333,8 +335,9 @@
 				this.$socket.emit('changeColor', {color});
 			},
 			sendAnswer(){
-				let {userInfo, answer, players} = this;
-				if(!answer || !(players.find((item,index) => item.name==userInfo.name))){
+				let {userInfo, answer, players, myTurn} = this;
+				//如果回答为空/观战/是画手 都不能发送消息
+				if(!answer || !(players.find((item,index) => item.name==userInfo.name)) || myTurn){
 					return;
 				}
 				this.$socket.emit('turnAnswer', {answer, name:userInfo.name});

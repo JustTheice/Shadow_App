@@ -246,7 +246,7 @@ function turnLogic(){
 	
 	//回合初始化
 	turnTip = '';
-	let type = Math.floor(Math.random()*5);
+	let type = Math.round(Math.random()*4);
 	switch (type){
 		case 0: turnTip = '成语';
 			break;
@@ -262,7 +262,7 @@ function turnLogic(){
 			break;
 	}
 	let riddleGroup = riddles[turnTip];
-	let riddleIndex = Math.round(Math.random()*riddleGroup.length);
+	let riddleIndex = Math.round(Math.random()*(riddleGroup.length-1));
 	turnAnswer = riddleGroup[riddleIndex];
 	turnCount = 10;
 	inRooms.forEach((item,index) => {
