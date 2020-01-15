@@ -20,7 +20,7 @@
 				</div>
 				<div class="tip">
 					<!-- {{painter==userInfo.name ? '你要画的是:'+title : `${answer.length} ${tip}`}} -->
-					{{`提示:${title.length}个字 ${tip}`}}
+					{{isPlaying ? (title.length===0?'':`提示: ${title.length}个字 ${tip}`) : '等待开始'}}
 				</div>
 				<div class="right">
 					<button class="line" @click="toggleRight('lineControl')"></button>
@@ -41,10 +41,13 @@
 					<div @touchstart="changeLine(2)"><span></span></div>
 					<div @touchstart="changeLine(5)"><span></span></div>
 					<div @touchstart="changeLine(9)"><span></span></div>
-					<div @touchstart="changeLine(15)"><span></span></div>
+					<div @touchstart="changeLine(20)"><span></span></div>
 				</div>
 			</div>
 			<canvas ref="canvas"></canvas>
+			<div class="ready" v-show="!isPlaying">
+				<button @click="toggleReady">准备</button>
+			</div>
 		</div>
 		<div class="msgbox" ref="msgbox">
 			<ul class="msgs">
@@ -75,6 +78,7 @@
 				</li>
 			</ul>
 		</div>
+		
 	</section>
 </template>
 
@@ -118,7 +122,6 @@
 				colorE: 'white',
 				scale: document.documentElement.clientWidth/16,
 				msgs: [],
-				myTurn: true,
 				canvasInfo: {
 					cL: 0,
 					cT: 0,
@@ -133,11 +136,15 @@
 				showMask: false,
 				isPlaying: false,
 				isOver: false,
-				rank: []
+				rank: [],
+				isReady: false
 			}
 		},
 		computed: {
 			...mapState(['userInfo']),
+			myTurn(){ //是否为自己回合
+				return this.painter===this.userInfo.name;
+			}
 		},
 		watch: {
 			showPlayers(newV){
@@ -171,6 +178,7 @@
 			},
 			canvasInit(){ //初始化canvas
 				let canvas = this.$refs.canvas;
+				let content = this.$refs.content;
 				if(canvas.getContext){
 					this.ctx = canvas.getContext('2d');
 				}
@@ -195,8 +203,7 @@
 					}
 					ctx.save();
 					let touch = ev.changedTouches[0];
-					let x = touch.clientX-canvasInfo.cL, y = touch.clientY-canvasInfo.cT;
-					x = x/
+					let x = touch.clientX-canvasInfo.cL-content.offsetLeft, y = touch.clientY-canvasInfo.cT-content.offsetTop;
 					vm.$socket.emit('startDraw', {x:x/scale, y:y/scale});
 				});
 				//手指移动
@@ -206,7 +213,7 @@
 						return;
 					}
 					let touch = ev.changedTouches[0];
-					let x = touch.clientX-canvasInfo.cL, y = touch.clientY-canvasInfo.cT;
+					let x = touch.clientX-canvasInfo.cL-content.offsetLeft, y = touch.clientY-canvasInfo.cT-content.offsetTop;
 					vm.$socket.emit('moveDraw', {x:x/scale,y:y/scale});
 				});
 				
@@ -245,20 +252,25 @@
 				let {userInfo} = this;
 				let vm = this;
 				this.$socket.emit('joinDrawRoom', {id:userInfo._id, name:userInfo.name});
-				this.sockets.subscribe('joinDrawRoom', function({msg,players}){
+				this.sockets.subscribe('joinDrawRoom', function({msg,players,isPlaying}){
 					vm.msgs.push(msg);
 					vm.players = players;
+					vm.isPlaying = isPlaying;
 				});
 			},
 			gameInit(){ //游戏逻辑初始化
 				//开始倒计时
 				this.sockets.subscribe('willStart', ({msg}) => {
 					this.msgs.push(msg)
+					this.isPlaying = true;
 				});
 				//每回合开始
 				this.sockets.subscribe('turnPainter', ({name, title}) => {
 					this.ctx.clearRect(0,0,this.canvasInfo.cW,this.canvasInfo.cH)
 					this.title = title;
+					this.players.forEach((item,index) => {
+						item.addScore = 0;
+					});
 					this.tip = '';
 					this.painter = name;
 					this.showMask = false;
@@ -272,11 +284,6 @@
 				this.sockets.subscribe('turnOver', () => {
 					this.showMask = true;
 					this.painter = '';
-					setTimeout(() => {
-						this.players.forEach((item,index) => {
-							item.addScore = 0;
-						});
-					},3000);
 				});
 				//有人回答
 				this.sockets.subscribe('turnAnswer', ({name, addScore, msg}) => {
@@ -294,15 +301,30 @@
 					this.tip = turnTip;
 				});
 				//游戏结束
-				this.sockets.subscribe('gameOver', ({rank}) => {
+				this.sockets.subscribe('gameOver', ({inRooms, rank}) => {
+					this.players = inRooms;
+					console.log(rank)
 					this.isPlaying = false;
 					this.isOver = true;
 					this.rank = rank;
 					setTimeout(() => {
 						this.isOver = false;
-						this.ctx.clearRect(0,0,this.canvasInfo.cW,this.canvasInfo.cH)
+						this.ctx.clearRect(0,0,this.canvasInfo.cW,this.canvasInfo.cH);
+						this.tip = '';
+						this.title = '';
 					},5000);
 				});
+				this.sockets.subscribe('toggleReady', (isReady, name) => { //更新准备状态
+					let player = this.players.find((item,index) => item.name==name);
+					player.isReady = isReady;
+					player.addScore = 'R';
+				});
+			},
+			toggleReady(ev){ //切换准备状态
+				this.isReady = !this.isReady;
+				let {isReady} = this;
+				ev.target.innerHtml = this.isReady ? '已准备' : '准备';
+				this.$socket.emit('toggleReady', {isReady, name});
 			},
 			changeLine(lv){ //更新线宽
 				this.$socket.emit('changeLine', {line:lv});
@@ -311,9 +333,12 @@
 				this.$socket.emit('changeColor', {color});
 			},
 			sendAnswer(){
-				let {userInfo, answer} = this;
-				console.log(userInfo)
+				let {userInfo, answer, players} = this;
+				if(!answer || !(players.find((item,index) => item.name==userInfo.name))){
+					return;
+				}
 				this.$socket.emit('turnAnswer', {answer, name:userInfo.name});
+				this.answer = '';
 			},
 			startDraw(x,y, cb){
 				let {ctx} = this;
@@ -416,6 +441,7 @@
 				}
 		}
 		.draw-content{
+			position: relative;
 			width: 16rem;
 			background: pink;
 			box-sizing: border-box;
@@ -578,7 +604,31 @@
 				}
 				
 			}
-			
+			.ready{
+				position: absolute;
+				top: 0;
+				left: 0;
+				background: rgba(25,25,25,.8);
+				width: 100%;
+				height: 100%;
+				button{
+					display: block;
+					border: 0;
+					border-radius: 10%;
+					width: 30%;
+					font-size: 2rem;
+					position: absolute;
+					left: 50%;
+					top: 40%;
+					transform: translate(-50%,-50%);
+					color: white;
+					background: rgba(50,100,233,.8);
+					height: 20%;
+					&:hover{
+						background: rgba(60,120,233,.8);
+					}
+				}
+			}
 		}
 		.msgbox{
 			color: rgb(25,25,25);
@@ -687,5 +737,6 @@
 				}
 			}
 		}
+		
 	}
 </style>

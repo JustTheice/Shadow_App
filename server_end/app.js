@@ -91,20 +91,42 @@ io.on('connection', function(socket){
 		// })){
 		// 	inRooms.push({name, score:0});
 		// }
-		inRooms.push({name, score:0});
+		inRooms.push({name, score:0, isP:false, isReady:false, addScore:0});
 		//记录到players
-		if(!isPlaying){ 
-			players.push({name, score:0, addScore:0, hasTrue: false});
+		// if(!isPlaying){ 
+		// 	players.push({name, score:0, addScore:0, hasTrue: false});
+		// }
+		let retRooms, msg;
+		if(isPlaying){
+			retRooms = inRooms.filter((item,index) => item.isP);
+		}else{
+			retRooms = inRooms;
 		}
-		io.to(DRAW_ROOM).emit('joinDrawRoom', {msg:{name:'',content:`欢迎${name}加入了房间`}, players});
+		if(inRooms.find((item,index) => item.name==name)){
+			msg = {name:'', content:`欢迎${name}重回房间`};
+		}else{
+			msg = {name:'', content:`欢迎${name}加入房间`};
+		}
+		io.to(DRAW_ROOM).emit('joinDrawRoom', {msg, players:retRooms, isPlaying});
 		
-		if(inRooms.length>=2 && !isPlaying){ //开始倒计时
+	});
+	socket.on('toggleReady', function(isReady, name){ //收到准备请求
+		inRooms.find((item,index) => item.name==name).isReady = isReady;
+		io.to(DRAW_ROOM).emit('toggleReady', {name,isReady});
+		//如果人数够,则开始游戏
+		if(isPlaying){
+			return;
+		}
+		if(inRooms.length>=3 && !isPlaying){ //开始倒计时
 			io.to(DRAW_ROOM).emit('willStart', {msg: {name:'',content:'如果不来人的话5秒后就开始了'}});
 			clearTimeout(startTimer);
 			startTimer = setTimeout(() => {
 				//开始游戏
-				players = inRooms;
+				// players = inRooms;
 				isPlaying = true;
+				inRooms.forEach((item,index) => {
+					item.isP = true;
+				})
 				turnLogic();
 			},5000);
 		}
@@ -143,8 +165,8 @@ io.on('connection', function(socket){
 		}
 		//答对加分
 		if(isRight && answer.length===turnAnswer.length){
-			var player = players.find((item,index) => {
-				return item.name == name;
+			var player = inRooms.find((item,index) => {
+				return item.name==name && item.isP;
 			});
 			if(!player.hasTrue){
 				addScore = 1;
@@ -183,11 +205,16 @@ function turnLogic(){
 	 * 		4.全部回合结束后,清空玩家列表
 	 */
 	
+	
 	//判断游戏是否结束
-	if(turnIndex>players.length-1){
+	if(turnIndex>inRooms.length-1){
 		isPlaying = false;
-		let rank = players;
-		//分数排序
+		inRooms.forEach((item,index) => {
+			item.isReady = false;
+		});
+		
+		let rank = deepClone(inRooms).filter((item,index) => item.isP);
+		// 分数排序
 		for (let i=0; i<rank.length-1; i++) { 
 			for (let j=0; j<rank.length-1-i; j++) {
 				if(rank[j].score < rank[j+1].score){
@@ -197,17 +224,29 @@ function turnLogic(){
 				}
 			}
 		}
-		
-		io.to(DRAW_ROOM).emit('gameOver', {rank});
+		//结束处理
+		clearInterval(turnTimer);
+		turnCount = 10;
 		turnIndex = 0;
-		players = [];
+		inRooms.forEach((item,index) => { //重置信息
+			item.isP = false;
+			item.score = 0;
+			item.addScore = 0;
+		});
+		io.to(DRAW_ROOM).emit('gameOver', {inRooms, rank});
 		console.log('游戏结束');
 		return
 	}
 	
+	//若不是玩家(是观看),则跳过他
+	if(!inRooms[turnIndex].isP){
+		turnIndex++;
+		turnLogic();
+	}
+	
 	//回合初始化
 	turnTip = '';
-	let type = Math.round(Math.random()*5);
+	let type = Math.floor(Math.random()*5);
 	switch (type){
 		case 0: turnTip = '成语';
 			break;
@@ -222,18 +261,19 @@ function turnLogic(){
 		default:
 			break;
 	}
-	let riddleGroup = riddles[type];
+	let riddleGroup = riddles[turnTip];
 	let riddleIndex = Math.round(Math.random()*riddleGroup.length);
 	turnAnswer = riddleGroup[riddleIndex];
 	turnCount = 10;
-	players.forEach((item,index) => {
+	inRooms.forEach((item,index) => {
 		item.addScore = 0;
 		item.hasTrue = false;
 	});
 	console.log(turnIndex+'回合')
 	//发送画者信息
-	io.to(DRAW_ROOM).emit('turnPainter', {name:players[turnIndex].name, title: '脑残'});
+	io.to(DRAW_ROOM).emit('turnPainter', {name:inRooms[turnIndex].name, title: turnAnswer});
 	
+	// clearInterval(turnTimer);
 	turnTimer = setInterval(() => {
 		turnCount--;
 		io.to(DRAW_ROOM).emit('turnCount', {turnCount});
@@ -243,6 +283,7 @@ function turnLogic(){
 			clearInterval(turnTimer);
 			turnIndex++;
 			io.to(DRAW_ROOM).emit('turnOver', {});
+			turnAnswer = '';
 			console.log('即将进入下一回合')
 			setTimeout(() => {
 				turnLogic();
@@ -253,6 +294,32 @@ function turnLogic(){
 	
 }
 
+//深度克隆
+function checkType(target) {
+	return Object.prototype.toString.call(target).slice(8, -1);
+}
+function deepClone(sample) {
+	let result;
+	let type = checkType(sample);
+	//如果样本不是对象或数组，直接返回即可，无需进行后续操作
+	if (type === 'Array') {
+		result = [];
+	} else if (type === 'Object') {
+		result = {};
+	} else {
+		return sample;
+	}
+	//遍历每一项并存进result里
+	for (let i in sample) {
+		//如果是对象或数组，则继续遍历
+		if (checkType(sample[i]) === 'Object' || checkType(sample[i]) === 'Array') {
+			result[i] = deepClone(sample[i]);
+		} else {
+			result[i] = sample[i];
+		}
+	}
+	return result;
+}
 
 server.listen(5000, () => {
 	console.log('server is running...');
