@@ -3,6 +3,9 @@
 		<div class="top" ref="top">
 			<div class="iconfont icon-back back" @click="$router.back"></div>
 			<h3 @click="showPlayers=!showPlayers">你画我猜</h3>
+			<div class="time-count">
+				{{turnCount}}
+			</div>
 		</div>
 		<div class="players" ref="players" :style="{height: showPlayers?'5rem':0}">
 			<div class="player-item" v-for="(player,index) in players" :key="index">
@@ -46,7 +49,7 @@
 			</div>
 			<canvas ref="canvas"></canvas>
 			<div class="ready" v-show="!isPlaying">
-				<button @click="toggleReady">准备</button>
+				<button @click="toggleReady">{{isReady ? '已准备' : '准备'}}</button>
 			</div>
 		</div>
 		<div class="msgbox" ref="msgbox">
@@ -137,7 +140,8 @@
 				isPlaying: false,
 				isOver: false,
 				rank: [],
-				isReady: false
+				isReady: false,
+				turnCount: 0
 			}
 		},
 		computed: {
@@ -281,6 +285,9 @@
 					
 					this.msgs.push({content: `现在由${name}绘画`});
 				});
+				this.sockets.subscribe('turnCount', ({turnCount}) => {
+					this.turnCount = turnCount;
+				});
 				//每回合结束
 				this.sockets.subscribe('turnOver', () => {
 					this.showMask = true;
@@ -316,17 +323,17 @@
 						this.title = '';
 					},5000);
 				});
-				this.sockets.subscribe('toggleReady', (isReady, name) => { //更新准备状态
-					let player = this.players.find((item,index) => item.name==name);
-					player.isReady = isReady;
-					player.addScore = 'R';
+				this.sockets.subscribe('toggleReady', ({name, inRooms}) => { //更新准备状态
+				console.log(inRooms)
+					this.players = inRooms;
 				});
 			},
 			toggleReady(ev){ //切换准备状态
 				this.isReady = !this.isReady;
-				let {isReady} = this;
+				let {isReady,userInfo} = this;
 				ev.target.innerHtml = this.isReady ? '已准备' : '准备';
-				this.$socket.emit('toggleReady', {isReady, name});
+				console.log(isReady, userInfo)
+				this.$socket.emit('toggleReady', {isReady, name:userInfo.name});
 			},
 			changeLine(lv){ //更新线宽
 				this.$socket.emit('changeLine', {line:lv});
@@ -384,7 +391,16 @@
 				padding: .5rem 0;
 				text-align: center;
 				font-size: 1rem;
-				
+			}
+			.time-count{
+				height: 2rem;
+				width: 2rem;
+				text-align: right;
+				top: 0;
+				position: absolute;
+				right: .5rem;
+				line-height: 2rem;
+				color: rgb(25,25,25);
 			}
 		}
 		.players{
@@ -618,7 +634,7 @@
 					display: block;
 					border: 0;
 					border-radius: 10%;
-					width: 30%;
+					min-width: 30%;
 					font-size: 2rem;
 					position: absolute;
 					left: 50%;

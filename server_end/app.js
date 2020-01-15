@@ -110,9 +110,11 @@ io.on('connection', function(socket){
 		io.to(DRAW_ROOM).emit('joinDrawRoom', {msg, players:retRooms, isPlaying});
 		
 	});
-	socket.on('toggleReady', function(isReady, name){ //收到准备请求
-		inRooms.find((item,index) => item.name==name).isReady = isReady;
-		io.to(DRAW_ROOM).emit('toggleReady', {name,isReady});
+	socket.on('toggleReady', function({isReady, name}){ //收到准备请求
+		let readyP = inRooms.find((item,index) => item.name==name);
+		readyP.isReady = isReady;
+		readyP.addScore = 'R';
+		io.to(DRAW_ROOM).emit('toggleReady', {name, inRooms});
 		//如果人数够,则开始游戏
 		if(isPlaying){
 			return;
