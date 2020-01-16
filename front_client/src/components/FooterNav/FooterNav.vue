@@ -1,21 +1,21 @@
 <template>
 	<Nav id='nav'>
-		<router-link to="/news" :class="{active: $route.path=='/news'}" replace>
+		<router-link to="/news" :class="{active: $route.path=='/news'}" replace event="touchend">
 			<i class="iconfont icon-news"></i>
 			<h2>资讯</h2>
 		</router-link>
 	
-		<router-link to="chatroom" :class="{active: $route.path=='/chatroom'}" replace>
+		<router-link to="chatroom" :class="{active: $route.path=='/chatroom'}" replace event="touchend">
 			<i class="iconfont icon-chatroom"></i>
 			<h2>聊天室</h2>
 		</router-link>
 	
-		<router-link to="tools" :class="{active: $route.path=='/tools'}" replace>
+		<router-link to="tools" :class="{active: $route.path=='/tools'}" replace event="touchend">
 			<i class="iconfont icon-tools"></i>
 			<h2>工具箱</h2>
 		</router-link>
 	
-		<router-link to="profile" :class="{active: $route.path=='/profile'}" replace>
+		<router-link to="profile" :class="{active: $route.path=='/profile'}" replace event="touchend">
 			<i class="iconfont icon-profile"></i>
 			<h2>我的</h2>
 		</router-link>

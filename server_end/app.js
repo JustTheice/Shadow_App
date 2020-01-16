@@ -12,7 +12,8 @@ const server = require('http').createServer(app);
 const io = require('socket.io')(server);
 
 app.all('*', function (req, res, next) {
-  res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+  // res.header('Access-Control-Allow-Origin', 'http://192.168.2.104');
+	res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', '*');
   res.header('Content-Type', 'application/json;charset=utf-8');
@@ -79,26 +80,29 @@ let turnTimer, turnAnswer='', turnTip='', turnCount = 10, turnIndex=0; //回合�
 const DRAW_ROOM = 'DRAW_ROOM';
 io.on('connection', function(socket){
 	console.log('一个用户连接到了socket');
+	socket.on('disconnect', function(socket){
+		console.log('一个用户断开了连接');
+	});
 	socket.on('chat message', function(msg){
 		console.log(msg)
 		io.emit('chat message', msg);
 	});
+	socket.on('leaveDrawRoom', function({name}){
+		socket.leave(DRAW_ROOM);
+		inRooms.splice(inRooms.findIndex((item,index) => item.name==name), 1);
+		console.log(inRooms)
+		io.to(DRAW_ROOM).emit('leaveDrawRoom', {name, inRooms});
+	});
 	socket.on('joinDrawRoom', function({name,id}){
 		socket.join(DRAW_ROOM);
-		//记录到inRooms
-		// if(!inRooms.find((item,index) => {
-		// 	return item.name === name;
-		// })){
-		// 	inRooms.push({name, score:0});
-		// }
-		inRooms.push({name, score:0, isP:false, isReady:false, addScore:0});
+		// inRooms.push({name, score:0, isP:false, isReady:false, addScore:0});
 		//记录到players
 		// if(!isPlaying){ 
 		// 	players.push({name, score:0, addScore:0, hasTrue: false});
 		// }
 		let retRooms, msg;
 		if(isPlaying){
-			retRooms = inRooms.filter((item,index) => item.isP);
+			retRooms = inRooms.filter((item,index) => item.isReady);
 		}else{
 			retRooms = inRooms;
 		}
@@ -106,6 +110,8 @@ io.on('connection', function(socket){
 			msg = {name:'', content:`欢迎${name}重回房间`};
 		}else{
 			msg = {name:'', content:`欢迎${name}加入房间`};
+			//记录到inRooms
+			inRooms.push({name, score:0, isReady:false, addScore:0});
 		}
 		io.to(DRAW_ROOM).emit('joinDrawRoom', {msg, players:retRooms, isPlaying});
 		
@@ -113,22 +119,17 @@ io.on('connection', function(socket){
 	socket.on('toggleReady', function({isReady, name}){ //收到准备请求
 		let readyP = inRooms.find((item,index) => item.name==name);
 		readyP.isReady = isReady;
-		readyP.addScore = 'R';
+		readyP.isReady ? readyP.addScore = 'R' : readyP.addScore = 0;
 		io.to(DRAW_ROOM).emit('toggleReady', {name, inRooms});
 		//如果人数够,则开始游戏
-		if(isPlaying){
-			return;
-		}
-		if(inRooms.length>=3 && !isPlaying){ //开始倒计时
+	 	let readyCount = inRooms.reduce((count,item) => count += (item.isReady?1:0), 0);
+		if(readyCount>=2 && !isPlaying){ //开始倒计时
 			io.to(DRAW_ROOM).emit('willStart', {msg: {name:'',content:'如果不来人的话5秒后就开始了'}});
 			clearTimeout(startTimer);
 			startTimer = setTimeout(() => {
 				//开始游戏
 				// players = inRooms;
 				isPlaying = true;
-				inRooms.forEach((item,index) => {
-					item.isP = true;
-				})
 				turnLogic();
 			},5000);
 		}
@@ -149,6 +150,9 @@ io.on('connection', function(socket){
 	socket.on('changeLine', function({line}){
 		io.to(DRAW_ROOM).emit('changeLine', {line});
 	});
+	socket.on('clearCanvas', function(){
+		io.to(DRAW_ROOM).emit('clearCanvas');
+	});
 	socket.on('turnAnswer', function({answer, name}){
 		console.log(answer, name)
 		let retStr = '';
@@ -168,7 +172,7 @@ io.on('connection', function(socket){
 		//答对加分
 		if(isRight && answer.length===turnAnswer.length){
 			var player = inRooms.find((item,index) => {
-				return item.name==name && item.isP;
+				return item.name==name && item.isReady;
 			});
 			if(!player.hasTrue){
 				addScore = 1;
@@ -211,13 +215,9 @@ function turnLogic(){
 	//判断游戏是否结束
 	if(turnIndex>inRooms.length-1){
 		isPlaying = false;
-		inRooms.forEach((item,index) => {
-			item.isReady = false;
-		});
 		
-		let rank = deepClone(inRooms).filter((item,index) => item.isP);
-		// 分数排序
-		for (let i=0; i<rank.length-1; i++) { 
+		let rank = deepClone(inRooms).filter((item,index) => item.isReady);
+		for (let i=0; i<rank.length-1; i++) {
 			for (let j=0; j<rank.length-1-i; j++) {
 				if(rank[j].score < rank[j+1].score){
 					let t = rank[j];
@@ -226,12 +226,16 @@ function turnLogic(){
 				}
 			}
 		}
+		
+		// 分数排序
+		
 		//结束处理
 		clearInterval(turnTimer);
 		turnCount = 10;
 		turnIndex = 0;
 		inRooms.forEach((item,index) => { //重置信息
-			item.isP = false;
+			// item.isP = false;
+			item.isReady = false;
 			item.score = 0;
 			item.addScore = 0;
 		});
@@ -241,7 +245,7 @@ function turnLogic(){
 	}
 	
 	//若不是玩家(是观看),则跳过他
-	if(!inRooms[turnIndex].isP){
+	if(!inRooms[turnIndex].isReady){
 		turnIndex++;
 		turnLogic();
 	}

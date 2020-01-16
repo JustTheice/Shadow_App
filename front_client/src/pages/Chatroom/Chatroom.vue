@@ -3,7 +3,7 @@
 		<HeaderTop title="聊天室"></HeaderTop>
 		<div class="recreations">
 			<div>
-				<h3 @touchstart="$router.push('/drawsth')">你画我猜</h3>
+				<h3 @touchstart="toDrawSth">你画我猜</h3>
 				<ul>
 					<li>房间1</li>
 				</ul>
@@ -96,8 +96,13 @@
 				this.$socket.emit('chat message', {name:this.$store.state.userInfo.name, msg:chatMsg});
 				this.chatMsg = '';
 			},
-			drawSth(){
-				Toast('即将开放，敬请期待！');
+			toDrawSth(){
+				let {userInfo} = this.$store.state;
+				if(userInfo._id){
+					this.$router.push('/drawsth');
+				}else{
+					Toast('请先登录！');
+				}
 			}
 		}
 	}

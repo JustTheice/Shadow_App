@@ -22,7 +22,6 @@ function getImgCode (req, res) {
 		console.log(req.session);
 		res.type('svg');
     res.send(captcha.data);
-		console.log(captcha.data)
 }
 
 
@@ -44,8 +43,6 @@ router.get('/getPhoneCode', (req, res, next) => {
 	req.session.phoneCode = code;
 	console.log(req.session)
 });
-
-
 
 
 //注册/登录
@@ -211,7 +208,6 @@ router.get('/getRank', (req, res, next) => {
 });
 
 
-
 //删除用户
 router.get('/signout', (req, res, next) => {
 	User.findByIdAndRemove(req.session.userId, (err, ret) => {
@@ -276,6 +272,35 @@ function randomCode(length){
 	}
 	return parseInt(code);
 }
+
+
+
+//处理头像上传
+// var storage = multer.diskStorage({ //配置文件存储
+// 	destination: function(req, file, cb) { //配置目录
+// 		cb(null, './public/uploads');
+// 	},
+// 	filename: function(req, file, cb) { //配置文件名
+// 		cb(null,req.session.user.email + '-avatar' + file.originalname.slice(file.originalname.length - 4));
+// 	}
+// });
+// var upload = multer({storage: storage});
+
+// //上传头像
+// router.post('/avatar', upload.single('avatar'), function(req, res, next) {
+// 	var avatar = req.file;
+// 	var filename = '127.0.0.1:5000/public/' + name + '-avatar' + avatar.originalname.slice(avatar.originalname.length - 4);
+// 	User.findOneAndUpdate({ //在数据库中寻找用户并更改信息
+// 		name
+// 	}, {
+// 		avatar: filename
+// 	}, function(err, ret) {
+// 		if(err) {
+// 			return next(err);
+// 		}
+// 		//返回新的用户信息
+// 	});
+// });
 
 
 module.exports = router;

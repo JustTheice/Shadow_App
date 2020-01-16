@@ -1,7 +1,7 @@
 <template>
 	<section id="drawsth" ref="wrap">
 		<div class="top" ref="top">
-			<div class="iconfont icon-back back" @click="$router.back"></div>
+			<div class="iconfont icon-back back" @click="$router.replace('/chatroom')"></div>
 			<h3 @click="showPlayers=!showPlayers">你画我猜</h3>
 			<div class="time-count">
 				{{turnCount}}
@@ -20,6 +20,7 @@
 				<div class="left">
 					<button class="pencil" :class="{active: type===0}" @click="type=0"></button>
 					<button class="eraser" :class="{active: type===1}" @click="type=1"></button>
+					<button class="clear"  @click="clearCanvas"></button>
 				</div>
 				<div class="tip">
 					<!-- {{painter==userInfo.name ? '你要画的是:'+title : `${answer.length} ${tip}`}} -->
@@ -87,6 +88,7 @@
 
 <script>
 	import {mapState} from 'vuex';
+	import {MessageBox} from 'mint-ui';
 	export default {
 		mounted() {
 			let wrap = this.$refs.wrap;
@@ -251,10 +253,16 @@
 					vm.line = line*0.05*scale;
 					vm.ctx.lineWidth = vm.line;
 				});
+				//清空画布
+				vm.sockets.subscribe('clearCanvas', function(){
+					vm.ctx.clearRect(0,0, canvasInfo.cW,canvasInfo.cH);
+				});
 			},
 			socketInit(){ //服务器连接初始化
 				let {userInfo} = this;
 				let vm = this;
+				console.log(111)
+				console.log(userInfo.name);
 				this.$socket.emit('joinDrawRoom', {id:userInfo._id, name:userInfo.name});
 				this.sockets.subscribe('joinDrawRoom', function({msg,players,isPlaying}){
 					vm.msgs.push(msg);
@@ -311,10 +319,10 @@
 				//游戏结束
 				this.sockets.subscribe('gameOver', ({inRooms, rank}) => {
 					this.players = inRooms;
-					console.log(rank)
 					this.isPlaying = false;
 					this.isOver = true;
 					this.rank = rank;
+					this.isReady = false;
 					setTimeout(() => {
 						this.isOver = false;
 						this.showMask = false;
@@ -323,8 +331,13 @@
 						this.title = '';
 					},5000);
 				});
-				this.sockets.subscribe('toggleReady', ({name, inRooms}) => { //更新准备状态
-				console.log(inRooms)
+				//更新准备状态
+				this.sockets.subscribe('toggleReady', ({name, inRooms}) => { 
+					this.players = inRooms;
+				});
+				//有人离开了房间
+				this.sockets.subscribe('leaveDrawRoom', ({name, inRooms}) => {
+					this.msgs.push({content: `${name}离开了房间`});
 					this.players = inRooms;
 				});
 			},
@@ -340,6 +353,9 @@
 			},
 			changeColor(color){ //更新颜色
 				this.$socket.emit('changeColor', {color});
+			},
+			clearCanvas(){
+				this.$socket.emit('clearCanvas');
 			},
 			sendAnswer(){
 				let {userInfo, answer, players, myTurn} = this;
@@ -364,6 +380,19 @@
 				ctx.stroke();
 				cb && cb();
 			}
+		},
+		beforeRouteLeave(to,from,next) {
+			let vm = this;
+			MessageBox.confirm('确定要退出游戏吗?').then(
+				action => {
+					vm.$socket.emit('leaveDrawRoom', {name: vm.userInfo.name});
+					next();
+				},
+				cancel => {
+					// next('/DrawSth');
+					window.history.pushState(null, null, '#/drawsth');
+				}
+			)
 		}
 	}
 </script>
@@ -498,6 +527,9 @@
 					.eraser{
 						background: url(./img/eraser.png);
 					}	
+					.clear{
+						background: url('./img/clear.png');
+					}
 				}
 				.right{
 					float: right;
@@ -667,7 +699,7 @@
 			}
 		}
 		.control{
-			background: yellow;
+			background: skyblue;
 			position: absolute;
 			bottom: 0;
 			left: 0;
