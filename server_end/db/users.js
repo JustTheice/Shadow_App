@@ -8,6 +8,7 @@ let Schema = new mongoose.Schema({
 	birthday: {type: String, required: false},
 	lv: {type: Number, default: 1},
 	experience: {type: Number, default: 0},
+	avatar: {type: String, required: false},
 	hobbies: {type: String, required: false},
 	introduction: {type: String, required: false},
 	integral: {type: Number, default: 0},

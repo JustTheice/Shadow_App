@@ -51,6 +51,7 @@ let proxys = {
 }
 app.use('/film', proxyMiddleWare(proxys)); 
 app.use('/static/',express.static(path.join(__dirname,'./static/')));
+app.use('/public/',express.static(path.join(__dirname,'./public/')));
 // app.get('/', (req, res, next) => {
 // 	res.type('html');
 // 	res.sendFile(path.join(__dirname,'./view/index.html'));

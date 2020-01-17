@@ -58,6 +58,9 @@
 					uploadAvatar(file).then(
 						(ret) => {
 							console.log(ret);
+							if(ret.code===0){
+								this.$store.dispatch('saveUser', {userInfo: ret.data});
+							}
 						}
 					);
 				}

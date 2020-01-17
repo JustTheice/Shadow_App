@@ -282,7 +282,7 @@ var storage = multer.diskStorage({ //配置文件存储
 		cb(null, './public/uploads/');
 	},
 	filename: function(req, file, cb) { //配置文件名
-		var avatar = req.file;
+		var avatar = file;
 		let suffixArr = avatar.originalname.split('.');
 		let suffix = suffixArr[suffixArr.length-1];
 		cb(null,req.session.userId + '-avatar.' + suffix);
@@ -292,7 +292,6 @@ var upload = multer({storage: storage});
 
 //上传头像
 router.post('/uploadAvatar', upload.single('avatar'), function(req, res, next) {
-	console.log(req.file)
 	var avatar = req.file;
 	let suffixArr = avatar.originalname.split('.');
 	let suffix = suffixArr[suffixArr.length-1];
@@ -305,6 +304,10 @@ router.post('/uploadAvatar', upload.single('avatar'), function(req, res, next) {
 			return console.log('头像信息更新失败'+err);
 		}
 		//返回新的用户信息
+		res.send(JSON.stringify({
+			code: 0,
+			data: ret
+		}));
 	});
 });
 

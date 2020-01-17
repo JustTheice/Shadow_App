@@ -3,7 +3,7 @@
 		<HeaderTop title="个人信息"></HeaderTop>
 		<div id="info">
 			<div class="avatar">
-				<img src="./img/avatar.png">
+				<img :src="userInfo.avatar ? userInfo.avatar : '../../../static/img/avatar.png'">
 			</div>
 			<div class="right">
 				<div class="not-login" v-show="!userInfo._id" @touchstart="shows.login=true">
