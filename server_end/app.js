@@ -17,9 +17,10 @@ const io = require('socket.io')(server);
 app.all('*', function (req, res, next) {
   // res.header('Access-Control-Allow-Origin', 'http://192.168.2.104');
 	res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+	// res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', '*');
-  res.header('Content-Type', 'application/json;charset=utf-8');
+  // res.header('Content-Type', 'application/json;charset=utf-8');
 	res.header('Access-Control-Allow-Credentials', 'true')
   next();
 });
@@ -50,7 +51,6 @@ let proxys = {
 	}
 }
 app.use('/film', proxyMiddleWare(proxys)); 
-app.use('/static/',express.static(path.join(__dirname,'./static/')));
 app.use('/public/',express.static(path.join(__dirname,'./public/')));
 // app.get('/', (req, res, next) => {
 // 	res.type('html');

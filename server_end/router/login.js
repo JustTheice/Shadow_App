@@ -296,7 +296,7 @@ router.post('/uploadAvatar', upload.single('avatar'), function(req, res, next) {
 	let suffixArr = avatar.originalname.split('.');
 	let suffix = suffixArr[suffixArr.length-1];
 	// var filename = '192.168.2.104:5000/public/' + req.session._id + '-avatar' + avatar.originalname.slice(avatar.originalname.length - 4);
-	let filename = `127.0.0.1:5000/public/uploads/${req.session.userId}-avatar.${suffix}`
+	let filename = `http://127.0.0.1:5000/public/uploads/${req.session.userId}-avatar.${suffix}`
 	User.findByIdAndUpdate(req.session.userId, {
 		avatar: filename
 	}, function(err, ret) {

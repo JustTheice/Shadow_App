@@ -24,7 +24,7 @@
 	import { MessageBox } from 'mint-ui';
 	import {updateInfo, uploadAvatar} from '../../api/server.js'
 	export default {
-		props: ['shows', 'backFn'],
+		props: ['shows', 'backFn', 'avatarImg'],
 		data(){
 			return {
 				
@@ -60,6 +60,7 @@
 							console.log(ret);
 							if(ret.code===0){
 								this.$store.dispatch('saveUser', {userInfo: ret.data});
+								this.avatarImg.src = ret.data.avatar +'?'+ Date.now();
 							}
 						}
 					);
