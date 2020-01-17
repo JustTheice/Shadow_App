@@ -15,3 +15,7 @@ export const updatePwd = (pwds) => ajax(baseUrl_Server+'/updatePwd', pwds, 'POST
 export const signout = () => ajax(baseUrl_Server+'/signout', {}, 'get', {withCredentials: true});
 //获取积分榜
 export const getRank = () => ajax(baseUrl_Server+'/getRank', {}, 'get');
+//上传头像
+export const uploadAvatar = (name, file) => {
+	return ajax(baseUrl_Server+'/uploadAvatar', {name,file}, 'POST', {withCredentials: true, headers:{'Content-Type':'multipart/form-data'}})
+	};

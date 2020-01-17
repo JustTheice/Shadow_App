@@ -7,6 +7,9 @@ const db = require('./db/index.js');
 const loginRouter = require('./router/login.js');
 const session = require('express-session');
 const bodyParser = require('body-parser');
+//配置body-parser模块来方便获取post请求的表单内容
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 const path = require('path');
 const server = require('http').createServer(app); 
 const io = require('socket.io')(server);
@@ -29,9 +32,7 @@ app.use(session({
   saveUninitialized: false,
 	cookie: { secure: false }
 }));
-//配置body-parser模块来方便获取post请求的表单内容
-app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+
 
 // //指定模板引擎
 // app.set("view engine", 'ejs');
@@ -76,7 +77,7 @@ fs.readFile('./data/riddles.json', 'utf8', function(err, data){
 let players = [], inRooms = [];
 let isPlaying = false;
 let startTimer, startCount; //开始游戏倒计时
-let turnTimer, turnAnswer='', turnTip='', turnCount = 10, turnIndex=0; //回合相关
+let turnTimer, turnAnswer='', turnTip='', turnCount = 10, turnIndex=0, rightCount=0 //回合相关
 const DRAW_ROOM = 'DRAW_ROOM';
 io.on('connection', function(socket){
 	console.log('一个用户连接到了socket');
@@ -154,10 +155,11 @@ io.on('connection', function(socket){
 		io.to(DRAW_ROOM).emit('clearCanvas');
 	});
 	socket.on('turnAnswer', function({answer, name}){
-		console.log(answer, name)
 		let retStr = '';
 		let isRight = true;
 		let addScore = 0;
+		let canAdd = false;
+		rightCount++;
 		//判断答案是否正确
 		for(let i=0; i<answer.length; i++){
 			console.log(answer[i])
@@ -175,14 +177,22 @@ io.on('connection', function(socket){
 				return item.name==name && item.isReady;
 			});
 			if(!player.hasTrue){
-				addScore = 1;
-				player.addScore = 1;
+				canAdd = true;
+				if(rightCount===1){ //自己加分
+					player.addScore = 2;
+				}else{
+					player.addScore = 1;
+				}
+				//画者加分
+				inRooms[turnIndex].score += 1;
+				inRooms[turnIndex].addScore = rightCount;
+				
 				player.score += player.addScore;
 				retStr = `${name}答对了`;
 				player.hasTrue = true;
 			}
 		}
-		io.to(DRAW_ROOM).emit('turnAnswer', {msg:retStr, addScore, name});
+		io.to(DRAW_ROOM).emit('turnAnswer', {msg:retStr, inRooms, canAdd, name});
 	});
 });
 /**
@@ -238,6 +248,7 @@ function turnLogic(){
 			item.isReady = false;
 			item.score = 0;
 			item.addScore = 0;
+			item.hasTrue = false;
 		});
 		io.to(DRAW_ROOM).emit('gameOver', {inRooms, rank});
 		console.log('游戏结束');
@@ -288,6 +299,7 @@ function turnLogic(){
 		}else if(turnCount<=0){ //回合结束
 			clearInterval(turnTimer);
 			turnIndex++;
+			rightCount = 0;
 			io.to(DRAW_ROOM).emit('turnOver', {});
 			turnAnswer = '';
 			console.log('即将进入下一回合')

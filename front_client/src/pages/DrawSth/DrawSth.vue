@@ -302,13 +302,10 @@
 					this.painter = '';
 				});
 				//有人回答
-				this.sockets.subscribe('turnAnswer', ({name, addScore, msg}) => {
-					if(addScore){
-						var player = this.players.find((item,index) => {
-							return item.name == name;
-						});
-						player.addScore = addScore;
-						player.score += player.addScore;
+				this.sockets.subscribe('turnAnswer', ({inRooms, msg, canAdd, name}) => {
+					console.log(inRooms, canAdd);
+					if(canAdd){
+						this.players = inRooms;
 					}
 					this.msgs.push({content: msg, name});
 				});

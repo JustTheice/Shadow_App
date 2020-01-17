@@ -6,6 +6,7 @@ var Base64 = require('js-base64').Base64;
 var request = require('request');
 var md5 = require('blueimp-md5')
 const User = require('../db/users.js');
+var multer = require('multer');
 
 
 function getImgCode (req, res) {
@@ -275,32 +276,33 @@ function randomCode(length){
 
 
 
-//处理头像上传
-// var storage = multer.diskStorage({ //配置文件存储
-// 	destination: function(req, file, cb) { //配置目录
-// 		cb(null, './public/uploads');
-// 	},
-// 	filename: function(req, file, cb) { //配置文件名
-// 		cb(null,req.session.user.email + '-avatar' + file.originalname.slice(file.originalname.length - 4));
-// 	}
-// });
-// var upload = multer({storage: storage});
+// 处理头像上传
+var storage = multer.diskStorage({ //配置文件存储
+	destination: function(req, file, cb) { //配置目录
+		cb(null, './public/uploads');
+	},
+	filename: function(req, file, cb) { //配置文件名
+		cb(null,req.session.userId + '-avatar' + file.originalname.slice(file.originalname.length - 4));
+	}
+});
+var upload = multer({storage: storage});
 
-// //上传头像
-// router.post('/avatar', upload.single('avatar'), function(req, res, next) {
-// 	var avatar = req.file;
-// 	var filename = '127.0.0.1:5000/public/' + name + '-avatar' + avatar.originalname.slice(avatar.originalname.length - 4);
-// 	User.findOneAndUpdate({ //在数据库中寻找用户并更改信息
-// 		name
-// 	}, {
-// 		avatar: filename
-// 	}, function(err, ret) {
-// 		if(err) {
-// 			return next(err);
-// 		}
-// 		//返回新的用户信息
-// 	});
-// });
+//上传头像
+router.post('/uploadAvatar', upload.single('avatar'), function(req, res, next) {
+	console.log(req.body)
+	var avatar = req.file;
+	var filename = '192.168.2.104:5000/public/' + req.session._id + '-avatar' + avatar.originalname.slice(avatar.originalname.length - 4);
+	User.findOneAndUpdate({ //在数据库中寻找用户并更改信息
+		name
+	}, {
+		avatar: filename
+	}, function(err, ret) {
+		if(err) {
+			return next(err);
+		}
+		//返回新的用户信息
+	});
+});
 
 
 module.exports = router;
