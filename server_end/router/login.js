@@ -279,26 +279,30 @@ function randomCode(length){
 // 处理头像上传
 var storage = multer.diskStorage({ //配置文件存储
 	destination: function(req, file, cb) { //配置目录
-		cb(null, './public/uploads');
+		cb(null, './public/uploads/');
 	},
 	filename: function(req, file, cb) { //配置文件名
-		cb(null,req.session.userId + '-avatar' + file.originalname.slice(file.originalname.length - 4));
+		var avatar = req.file;
+		let suffixArr = avatar.originalname.split('.');
+		let suffix = suffixArr[suffixArr.length-1];
+		cb(null,req.session.userId + '-avatar.' + suffix);
 	}
 });
 var upload = multer({storage: storage});
 
 //上传头像
 router.post('/uploadAvatar', upload.single('avatar'), function(req, res, next) {
-	console.log(req.body)
+	console.log(req.file)
 	var avatar = req.file;
-	var filename = '192.168.2.104:5000/public/' + req.session._id + '-avatar' + avatar.originalname.slice(avatar.originalname.length - 4);
-	User.findOneAndUpdate({ //在数据库中寻找用户并更改信息
-		name
-	}, {
+	let suffixArr = avatar.originalname.split('.');
+	let suffix = suffixArr[suffixArr.length-1];
+	// var filename = '192.168.2.104:5000/public/' + req.session._id + '-avatar' + avatar.originalname.slice(avatar.originalname.length - 4);
+	let filename = `127.0.0.1:5000/public/uploads/${req.session.userId}-avatar.${suffix}`
+	User.findByIdAndUpdate(req.session.userId, {
 		avatar: filename
 	}, function(err, ret) {
 		if(err) {
-			return next(err);
+			return console.log('头像信息更新失败'+err);
 		}
 		//返回新的用户信息
 	});

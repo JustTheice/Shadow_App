@@ -54,7 +54,8 @@
 					imgCode: '',
 					phoneCode: ''
 				},
-				imgCodeSrc: 'http://192.168.2.104:5000/getImgCode?'+Date.now(),
+				// imgCodeSrc: 'http://192.168.2.104:5000/getImgCode?'+Date.now(),
+				imgCodeSrc:'http://127.0.0.1:5000/getImgCode?'+Date.now(),
 				codeCount: 0
 			}
 		},
@@ -105,7 +106,8 @@
 			},
 			
 			getImgCode(){ //重新加载图形验证码
-				this.imgCodeSrc = 'http://192.168.2.104:5000/getImgCode?'+Date.now();
+				// this.imgCodeSrc = 'http://192.168.2.104:5000/getImgCode?'+Date.now();
+				this.imgCodeSrc = 'http://127.0.0.1:5000/getImgCode?'+Date.now();
 			},
 			
 			getPhoneCode(){ //获取手机验证码

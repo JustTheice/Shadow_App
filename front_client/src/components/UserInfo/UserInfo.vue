@@ -52,11 +52,10 @@
 			uploadAvatar(event){ //上传头像
 				if(event.target.files.length>0){
 					let avatar = event.target.files[0];
-					let file = new FormData()
-					file.append('image', avatar)
+					let file = new window.FormData();
+					file.append('avatar', avatar);
 					// let files = event.target.value;
-					console.log(file)
-					uploadAvatar(this.userInfo.name, file).then(
+					uploadAvatar(file).then(
 						(ret) => {
 							console.log(ret);
 						}

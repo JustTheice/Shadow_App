@@ -17,8 +17,8 @@ Vue.config.productionTip = true;
 Vue.use(MintUI);
 Vue.use(new VueSocketIO({
 	debug: true,
-	connection: 'http://192.168.2.104:5000',
-	// connection: 'http://127.0.0.1:5000',
+	// connection: 'http://192.168.2.104:5000',
+	connection: 'http://127.0.0.1:5000',
 	sockets: {
 		connect: function () {
 				console.log('socket.io连接成功')

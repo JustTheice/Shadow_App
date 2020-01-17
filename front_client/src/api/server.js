@@ -1,7 +1,7 @@
 let baseUrl_api = '/server';
 import ajax from './ajax.js';
-let baseUrl_Server = 'http://192.168.2.104:5000';
-// let baseUrl_Server = 'http://127.0.0.1:5000';
+// let baseUrl_Server = 'http://192.168.2.104:5000';
+let baseUrl_Server = 'http://127.0.0.1:5000';
 
 export const reqPhoneCode = (phone) => ajax(baseUrl_Server+'/getPhoneCode', {phone}, 'get', { withCredentials: true});
 export const reqLogin = (sendData) => ajax(baseUrl_Server+'/login', sendData, 'POST', { withCredentials: true});
@@ -16,6 +16,7 @@ export const signout = () => ajax(baseUrl_Server+'/signout', {}, 'get', {withCre
 //获取积分榜
 export const getRank = () => ajax(baseUrl_Server+'/getRank', {}, 'get');
 //上传头像
-export const uploadAvatar = (name, file) => {
-	return ajax(baseUrl_Server+'/uploadAvatar', {name,file}, 'POST', {withCredentials: true, headers:{'Content-Type':'multipart/form-data'}})
-	};
+export const uploadAvatar = (file) => {
+	return ajax(baseUrl_Server+'/uploadAvatar', file, 'POST', {withCredentials: true})
+ };
+	// headers:{'Content-Type':'multipart/form-data'}
