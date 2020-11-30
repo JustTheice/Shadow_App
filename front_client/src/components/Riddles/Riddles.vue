@@ -1,19 +1,19 @@
 <template>
 	<section id="riddles" ref="riddles">
 		<div class="top">
-			<div class="iconfont icon-back" @touchend="back"></div>
+			<div class="iconfont icon-back" @touchend="btnBack"></div>
 			<h3>猜灯谜</h3>
 		</div>
 		<div class="content" ref="content">
 			<div class="answer" :style="{opacity: status===0 ? 0 : 1}">
-				<p class="result">{{status===1 ? '回答正确' : (status===2?'回答错误':'这都不会？')}}
-					<span v-show="status!==1">答案是{{answer}}</span>
+				<p class="result" :style="{'font-size': settings.adjustSize*0.5+'rem'}">{{status===1 ? '回答正确' : (status===2?'回答错误':'这都不会？')}}
+					<span v-show="status!==1" :style="{'font-size': settings.adjustSize*0.45+'rem'}">答案是{{answer}}</span>
 				</p>
-				<p class="description">{{description}}</p>
+				<p class="description" :style="{'font-size': settings.adjustSize*0.35+'rem','line-height':settings.adjustSize*0.4+'rem'}">{{description}}</p>
 			</div>
 			<div class="question" ref="question">
-				<p class="riddle">{{riddle}}</p>
-				<p class="type">{{type}}</p>
+				<p class="riddle" :style="{'font-size': settings.adjustSize*0.4+'rem','line-height':settings.adjustSize*0.45+'rem'}">{{riddle}}</p>
+				<p class="type" :style="{'font-size': settings.adjustSize*0.45+'rem','line-height':settings.adjustSize*0.5+'rem'}">{{type}}</p>
 			</div>
 		</div>
 		<div class="control" ref="control">
@@ -31,6 +31,7 @@
 <script>
 	import {MessageBox, Toast, Indicator} from 'mint-ui'
 	import {reqRiddle} from '../../api/tools.js';
+	import {mapState} from 'vuex';
 	export default {
 		props: ['shows'],
 		data(){
@@ -43,6 +44,9 @@
 				status: 0, //回答状态  0未回答，1回答正确，2回答错误 3不会
 			}
 		},
+		computed: {
+			...mapState(['settings'])
+		},
 		mounted() {
 			Indicator.open('寻找灯谜中');
 			this.updateRiddle(() => {
@@ -52,9 +56,8 @@
 			instruction.style.height = (riddles.clientHeight-content.offsetHeight-control.offsetHeight) + 'px';
 		},
 		methods: {
-			back(){
-				// MessageBox('不玩了吗？').then(action => this.shows.riddles=false);
-				this.shows.riddles=false
+			btnBack(){ //返回
+				window.history.back();
 			},
 			submit(r){ //处理回答
 				if(r){

@@ -1,5 +1,6 @@
 import apis from '../api/news.js';
 import {reqLogin} from '../api/server.js';
+import saveUtil from '../saveUtil/index.js';
 export default {
 	async getNews({commit,state}, {type,cb}){ //获取新闻
 		let fn = 'req'+type+'News';
@@ -19,8 +20,9 @@ export default {
 		commit('UPDATE_USERINFO', {userInfo});
 	},
 	updateSize({commit}, {newV}){ //调节字体
-		newV *= 0.4;
-		commit('UPDATE_SIZE', {newV})
+		// newV *= 0.4;
+		commit('UPDATE_SIZE', {newV});
+		saveUtil.save('FONT_SIZE',newV);
 	},
 	"SOCKET_chat message"({commit}, item) { //更新聊天室消息记录
 		commit('UPDATE_CHAT_MSG',{item});

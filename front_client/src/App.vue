@@ -46,4 +46,12 @@
 		height: 100%;
 		overflow: hidden;
 	}
+	.mint-indicator{
+		.mint-indicator-wrapper{
+			// position: absolute;
+			// top: 0;
+			// left: 0;
+			z-index: 99!important;
+		}
+	}
 </style>

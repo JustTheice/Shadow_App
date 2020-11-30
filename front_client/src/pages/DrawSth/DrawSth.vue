@@ -9,7 +9,7 @@
 		</div>
 		<div class="players" ref="players" :style="{height: showPlayers?'5rem':0}">
 			<div class="player-item" v-for="(player,index) in players" :key="index">
-				<img src="./img/avatar.png" alt="玩家">
+				<img :src="userInfo.avatar ? userInfo.avatar : './static/img/avatar.png'" alt="玩家">
 				<p>{{player.name}}</p>
 				<span>{{player.score}}</span>
 				<div class="mask" v-show="player.addScore">+{{player.addScore}}</div>
@@ -443,8 +443,11 @@
 				padding: 0 .2rem;
 				height: 2.5rem;
 				position: relative;
+				text-align: center;
 				img{
-					width: 100%;
+					width: 2.1rem;
+					height: 2.1rem;
+					border-radius: 50%;
 				}
 				p{
 					overflow: hidden;

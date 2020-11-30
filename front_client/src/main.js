@@ -7,6 +7,7 @@ import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
 import store from './store/';
 import VueLazyload from 'vue-lazyload';
+import dateFns from 'date-fns/format';
 //websocket
 import VueSocketIO from 'vue-socket.io'
 
@@ -17,8 +18,8 @@ Vue.config.productionTip = true;
 Vue.use(MintUI);
 Vue.use(new VueSocketIO({
 	debug: true,
-	// connection: 'http://192.168.2.104:5000',
-	connection: 'http://127.0.0.1:5000',
+	connection: 'http://192.168.2.104:5000',
+	// connection: 'http://127.0.0.1:5000',
 	sockets: {
 		connect: function () {
 				console.log('socket.io连接成功')
@@ -35,7 +36,11 @@ Vue.use(new VueSocketIO({
 
 //图片懒加载
 Vue.use(VueLazyload, {
-	loading: '../static/img/loading.gif',
+	loading: '../static/img/loading.gif'
+});
+
+Vue.filter('dateFormat', function(v,format='yyyy-MM-dd HH:mm:ss'){
+	return dateFns(v, format);
 });
 
 /* eslint-disable no-new */
@@ -44,5 +49,5 @@ new Vue({
   router,
 	store,
   components: { App },
-  template: '<App/>'
-})
+  template: '<App/>',
+});

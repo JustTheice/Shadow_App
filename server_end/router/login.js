@@ -295,8 +295,9 @@ router.post('/uploadAvatar', upload.single('avatar'), function(req, res, next) {
 	var avatar = req.file;
 	let suffixArr = avatar.originalname.split('.');
 	let suffix = suffixArr[suffixArr.length-1];
+	console.log(avatar)
 	// var filename = '192.168.2.104:5000/public/' + req.session._id + '-avatar' + avatar.originalname.slice(avatar.originalname.length - 4);
-	let filename = `http://127.0.0.1:5000/public/uploads/${req.session.userId}-avatar.${suffix}`
+	let filename = `http://192.168.2.104:5000/public/uploads/${req.session.userId}-avatar.${suffix}`;
 	User.findByIdAndUpdate(req.session.userId, {
 		avatar: filename
 	}, function(err, ret) {
@@ -304,10 +305,16 @@ router.post('/uploadAvatar', upload.single('avatar'), function(req, res, next) {
 			return console.log('头像信息更新失败'+err);
 		}
 		//返回新的用户信息
-		res.send(JSON.stringify({
-			code: 0,
-			data: ret
-		}));
+		User.findById(req.session.userId, function(err,ret){
+			if(err) {
+				return console.log('头像信息更新失败'+err);
+			}
+			console.log(ret);
+			res.send(JSON.stringify({
+				code: 0,
+				data: ret
+			}));
+		})
 	});
 });
 

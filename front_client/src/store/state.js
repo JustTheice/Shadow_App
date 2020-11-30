@@ -1,3 +1,4 @@
+import saveUtil from '../saveUtil/index.js';
 export default {
 	news: {
 		IT: [],
@@ -10,7 +11,7 @@ export default {
 		
 	},
 	settings: {
-		adjustSize: 0.8
+		adjustSize: (saveUtil.read('FONT_SIZE')&&typeof saveUtil.read('FONT_SIZE')!='object') ? saveUtil.read('FONT_SIZE') : 2
 	},
 	chatMsgs: []
 }

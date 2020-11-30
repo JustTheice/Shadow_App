@@ -13,10 +13,10 @@
 			<div class="content" ref="content">
 				<ul id="msgUl">
 					<li v-for="(msg,index) in chatMsgs" :class="msg.name==$store.state.userInfo.name?'self':'others'" :key="index">
-						<img src="./img/avatar.png" alt="头像">
+						<img :src="msg.avatar ? msg.avatar+'?'+Date.now() : './static/img/avatar.png'" alt="头像">
 						<div>
 							<p class="name">{{msg.name==$store.state.userInfo.name?'我':msg.name}}说：</p>
-							<p class="msg adjust" :style="{'font-size': settings.adjustSize+'rem'}">{{msg.msg}}</p>
+							<p class="msg adjust" :style="{'font-size': settings.adjustSize*0.4+'rem'}">{{msg.msg}}</p>
 						</div>
 					</li>
 				</ul>
@@ -157,6 +157,9 @@
 								font-size: 2rem;
 								width: 2rem;
 								height: 2rem;
+								border-radius: 50%;
+								display: block;
+								margin-top: .2rem;
 							}
 						>div{
 							p{

@@ -9,6 +9,10 @@
 						<i class="iconfont icon-weather"></i>
 						<span>天气预报</span>
 					</div>
+					<div class="item-tool" @touchend="shows.virus=true">
+						<i class="iconfont icon-virus"></i>
+						<span>实时疫情</span>
+					</div>
 				</div>
 			</div>
 			<div class="row row-life">
@@ -23,6 +27,7 @@
 		</section>
 		<Weather v-if="shows.weather" :shows="shows"></Weather>
 		<Riddles v-if="shows.riddles" :shows="shows"></Riddles>
+		<Virus v-if="shows.virus" :shows="shows"></Virus>
 	</section>
 </template>
 
@@ -30,15 +35,17 @@
 	import HeaderTop from '../../components/HeaderTop/HeaderTop.vue';
 	import Weather from '../../components/Weather/Weather.vue';
 	import Riddles from '../../components/Riddles/Riddles.vue';
+	import Virus from '../../components/Virus/Virus.vue';
 	export default{
 		components: {
-			HeaderTop, Weather, Riddles
+			HeaderTop, Weather, Riddles, Virus
 		},
 		data(){
 			return {
 				shows: {
 					weather: false,
-					riddles: false
+					riddles: false,
+					virus: false
 				}
 			}
 		},

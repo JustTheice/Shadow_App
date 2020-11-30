@@ -13,10 +13,12 @@ app.use(bodyParser.json());
 const path = require('path');
 const server = require('http').createServer(app); 
 const io = require('socket.io')(server);
+const User = require('./db/users.js');
+
 
 app.all('*', function (req, res, next) {
-  // res.header('Access-Control-Allow-Origin', 'http://192.168.2.104');
-	res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
+  res.header('Access-Control-Allow-Origin', 'http://192.168.2.104');
+	// res.header('Access-Control-Allow-Origin', 'http://localhost:8080');
 	// res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
   res.header('Access-Control-Allow-Methods', '*');
@@ -85,9 +87,13 @@ io.on('connection', function(socket){
 	socket.on('disconnect', function(socket){
 		console.log('一个用户断开了连接');
 	});
-	socket.on('chat message', function(msg){
-		console.log(msg)
-		io.emit('chat message', msg);
+	socket.on('chat message', function({name, msg}){
+		User.findOne({name}, (err,ret) => {
+			if(err){
+				return console.log('查找失败'+err);
+			}
+			io.emit('chat message', {name, msg, avatar:ret.avatar});
+		});
 	});
 	socket.on('leaveDrawRoom', function({name}){
 		socket.leave(DRAW_ROOM);

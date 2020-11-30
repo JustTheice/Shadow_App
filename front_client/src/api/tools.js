@@ -8,3 +8,7 @@ let key = 'c16974c0d9041314dc51d9ce502d0d05'
 export const reqWeather = (city) => ajax(Base_Url+'tianqi/index', {key,city});
 //获取灯谜
 export const reqRiddle = () => ajax(Base_Url+'/caizimi/index', {key});
+//获取疫情主体信息
+export const reqNcov = () => ajax(Base_Url+'/ncov/index', {key});
+//获取疫情省市信息
+export const reqNcovCity = () => ajax(Base_Url+'/ncovcity/index', {key});

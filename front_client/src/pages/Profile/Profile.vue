@@ -2,8 +2,8 @@
 	<section id="profile">
 		<HeaderTop title="个人信息"></HeaderTop>
 		<div id="info">
-			<div class="avatar">
-				<img :src="userInfo.avatar ? userInfo.avatar : '../../../static/img/avatar.png'" ref="avatarImg">
+			<div class="avatar" ref="avatarWrap">
+				<img :src="userInfo.avatar ? userInfo.avatar : './static/img/avatar.png'">
 			</div>
 			<div class="right">
 				<div class="not-login" v-show="!userInfo._id" @touchstart="shows.login=true">
@@ -31,7 +31,7 @@
 		</div>
 		<Login :style="{transform: shows.login?'translateX(0)':'translateX(100%)'}" :shows="shows"></Login>
 		<Setting :style="{transform: shows.setting?'translateX(0)':'translateX(100%)'}" :shows="shows" :userId="userInfo._id"></Setting>
-		<UserInfo :style="{transform: shows.userInfo?'translateX(0)':'translateX(100%)'}" :shows="shows" :avatarImg="$refs.avatarImg"></UserInfo>
+		<UserInfo :style="{transform: shows.userInfo?'translateX(0)':'translateX(100%)'}" :shows="shows" :avatarImg="$refs.avatarWrap"></UserInfo>
 		<Score :style="{transform: shows.score?'translateX(0)':'translateX(100%)'}" :shows="shows"></Score>
 	</section>
 </template>
@@ -86,7 +86,7 @@
 						shows[key] = false;
 					}
 				}
-			}
+			},
 		},
 		destroyed() {
 			window.removeEventListener('popstate', this.backFn);
@@ -98,6 +98,7 @@
 		},
 		beforeRouteLeave(to, from, next) {
 			window.removeEventListener('popstate', this.backFn);
+			
 			next();
 		}
 	}

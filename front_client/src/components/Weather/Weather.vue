@@ -1,7 +1,7 @@
 <template>
 	<section id="weather">
 		<div id="w-top">
-			<div class="back iconfont icon-back" @click="shows.weather=false"></div>
+			<div class="back iconfont icon-back" @click="btnBack"></div>
 			<h2>邯郸</h2>
 		</div>
 		<div id="today">
@@ -18,7 +18,7 @@
 				</div>
 			</div>
 			<div class="tip">
-				<p v-if="days.length">“{{days[0].tips}}”</p>
+				<p v-if="days.length" :style="{'font-size': settings.adjustSize*0.4+'rem!important','line-height':settings.adjustSize*0.45+'rem!important'}">“{{days[0].tips}}”</p>
 			</div>
 			<div class="air">
 				<div class="pollute">
@@ -58,6 +58,7 @@
 
 <script>
 	import {reqWeather, reqAddress} from '../../api/tools';
+	import {mapState} from 'vuex';
 	export default {
 		props: ['shows'],
 		data(){
@@ -67,6 +68,9 @@
 				address: '',
 				city: '邯郸'
 			}
+		},
+		computed: {
+			...mapState(['settings']),
 		},
 		mounted() {
 			reqWeather('邯郸').then(
@@ -104,6 +108,9 @@
 			      reject('你的浏览器不支持当前地理位置信息获取')
 			    }
 			  })
+			},
+			btnBack(){ //返回
+				window.history.back();
 			}
 		}
 	}

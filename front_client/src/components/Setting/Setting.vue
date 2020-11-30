@@ -2,9 +2,9 @@
 	<section id="setting">
 		<div class="back iconfont icon-back" @touchend="btnBack"></div>
 		<div class="font-setting">
-			<h3 class="adjust" :style="{'font-size': $store.state.settings.adjustSize + 'rem'}">字体大小</h3>
+			<h3 class="adjust" :style="{'font-size': $store.state.settings.adjustSize*0.4 + 'rem'}">字体大小</h3>
 			<div class="right">
-				<mt-range v-model="fontLv" :min="1" :max="4" value="2">
+				<mt-range v-model="fontLv" :min="1" :max="4">
 				  <div slot="start" style="font-size: .5rem;">小</div>
 				  <div slot="end" style="font-size: 1.5rem;">大</div>
 				</mt-range>
@@ -28,6 +28,7 @@
 <script>
 	import {updatePwd, signout} from '../../api/server.js'
 	import { MessageBox } from 'mint-ui';
+	import {mapState} from 'vuex';
 	export default {
 		props: ['shows', 'userId'],
 		data(){
@@ -43,6 +44,12 @@
 			fontLv(newV){
 				this.$store.dispatch('updateSize', {newV});
 			}
+		},
+		computed: {
+			...mapState(['settings'])
+		},
+		mounted() {
+			this.fontLv = this.settings.adjustSize;
 		},
 		methods: {
 			changePwd(){

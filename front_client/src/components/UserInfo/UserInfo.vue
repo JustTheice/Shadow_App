@@ -7,8 +7,17 @@
 		</div>
 		<form action="/">
 			<div class="up-avatar">
-				<input type="file" @change="uploadAvatar" accept="image/jpeg,image/jpg,image/png,image/bmp,image/gif">
+				<div class="left">
+					<img :src="userInfo.avatar ? userInfo.avatar : './static/img/avatar.png'" ref="seeImg"/>
+				</div>
+				<div class="right">
+					<input type="file" @change="uploadAvatar" accept="image/jpeg,image/jpg,image/png,image/bmp,image/gif">
+					<div class="feign">
+						<button>点击选择图片</button>
+					</div>
+				</div>
 			</div>
+			<!-- <mt-field label="头像" placeholder="上传头像" @change="uploadAvatar" type="file" rows="4"></mt-field> -->
 			<mt-field label="昵称" placeholder="请输入用户名" v-model="userInfo.name"></mt-field>
 			<mt-field label="爱好" v-model="userInfo.hobbies"></mt-field>
 			<mt-field label="生日" placeholder="请输入生日" type="date" v-model="userInfo.birthday"></mt-field>
@@ -24,7 +33,7 @@
 	import { MessageBox } from 'mint-ui';
 	import {updateInfo, uploadAvatar} from '../../api/server.js'
 	export default {
-		props: ['shows', 'backFn', 'avatarImg'],
+		props: ['shows', 'backFn', 'avatarWrap'],
 		data(){
 			return {
 				
@@ -60,7 +69,13 @@
 							console.log(ret);
 							if(ret.code===0){
 								this.$store.dispatch('saveUser', {userInfo: ret.data});
-								this.avatarImg.src = ret.data.avatar +'?'+ Date.now();
+								// document.querySelector('.left').removeChild(document.querySelector('.left>img'))
+								// let newAvatar = new Image();
+								// newAvatar.src = ret.data.avatar+'?'+Date.now();
+								// document.querySelector('.left').appendChild(newAvatar);
+								// let avatarWrap = this.avatarWrap;
+								// avatarWrap.removeChild(avatarWrap.querySelector('img'));
+								// avatarWrap.appendChild(newAvatar);
 							}
 						}
 					);
@@ -101,7 +116,63 @@
 				line-height: 2rem;
 				color: rgb(25,25,25);
 			}
+			
 		}
-		
+		.up-avatar{
+			width: 100%;
+			height: 3rem;
+			background: white;
+			.left{
+				box-sizing: border-box;
+				width: 5rem;
+				height: 100%;
+				float: left;
+				img{
+					display: block;
+					padding: .25rem;
+					width: 2.5rem;
+					height: 2.5rem;
+					border-radius: 50%;
+				}
+			}
+			.right{
+				width: 11rem;
+				float: right;
+				height: 100%;
+				position: relative;
+				input{
+					width: 8rem;
+					height: 2rem;
+					position: absolute;
+					right: 2rem;
+					top: 50%;
+					transform: translateY(-50%);
+					z-index: 5;
+					display: block;
+					opacity: 0;
+				}
+				.feign{
+					position: absolute;
+					right: 2rem;
+					top: 50%;
+					transform: translateY(-50%);
+					width: 8rem;
+					height: 2rem;
+					z-index: 4;
+					button{
+						color: rgb(25,25,25);
+						display: block;
+						width: 100%;
+						height: 100%;
+						border: 1px solid rgb(25,25,25);
+						border-radius: .3rem;
+						background: whitesmoke;
+						font-size: 1rem;
+						line-height: 2rem;
+					}
+				}
+			}
+			
+		}
 	}
 </style>
