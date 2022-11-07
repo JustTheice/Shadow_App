@@ -14,7 +14,7 @@
 				<mt-field label="验证码" placeholder="不分大小写" type="text" v-model="pwdData.imgCode">
 					<img :src="imgCodeSrc" alt="验证码" class="img-code" @touchstart="getImgCode"/>
 				</mt-field>
-				<mt-button type="primary" size="large" @touchend.native="login()">注册/登录</mt-button>
+				<mt-button type="primary" size="large" @click="login">注册/登录</mt-button>
 			</div>
 			<div class="phone" v-show="type=='phone'">
 				<mt-field label="手机号" placeholder="仅支持中国大陆" type="tel" v-model="phoneData.phone">
@@ -61,6 +61,8 @@
 		},
 		methods: {
 			login(){ //注册/登录
+				console.log('登陆了')
+
 				let {type, pwdData, phoneData} = this;
 				let sendData;
 				if(type=='pwd'){ //密码登录，前端检查用户名、密码、验证码位数是否正确

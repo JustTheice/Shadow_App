@@ -50,20 +50,22 @@ router.get('/getPhoneCode', (req, res, next) => {
 router.post('/login', (req, res, next) => {
 	let logType = req.body.type;
 	let data = req.body.data;
+	console.log('用户登录')
 	console.log(req.session)
 	if(logType=='pwd'){
 		data.pwd = md5(md5(data.pwd));
 	}
 	let searchKey;
 	if(logType == 'pwd'){
-		if(data.imgCode == req.session.captcha){
-			searchKey = {name: data.name};
-		} else{
-			return res.send(JSON.stringify({
-				code: 1,
-				msg: '验证码错误'
-			}));
-		}
+		searchKey = {name: data.name};
+		// if(data.imgCode == req.session.captcha){
+		// 	searchKey = {name: data.name};
+		// } else{
+		// 	return res.send(JSON.stringify({
+		// 		code: 1,
+		// 		msg: '验证码错误'
+		// 	}));
+		// }
 	}else if(logType == 'phone'){
 		if(data.phoneCode == req.session.phoneCode){
 			searchKey = {phone: data.phone};
@@ -92,12 +94,14 @@ router.post('/login', (req, res, next) => {
 			if(logType == 'pwd'){
 				User.findOne({name: data.name, pwd: data.pwd}, (err, ret) => {
 					if(!ret){ //密码不匹配
+						console.log('密码不对')
 						return res.send(JSON.stringify({
 							code: 2,
 							msg: '用户名已存在但密码不匹配'
 						}));
 					}else{
 						req.session.userId = ret._id;
+						console.log(ret)
 						return res.send(JSON.stringify({
 							code: 0,
 							data: ret,
@@ -285,7 +289,7 @@ var storage = multer.diskStorage({ //配置文件存储
 		var avatar = file;
 		let suffixArr = avatar.originalname.split('.');
 		let suffix = suffixArr[suffixArr.length-1];
-		cb(null,req.session.userId + '-avatar.' + suffix);
+		cb(null,req.session.userId + suffix[0] + '-avatar.' + suffix);
 	}
 });
 var upload = multer({storage: storage});
@@ -294,8 +298,9 @@ var upload = multer({storage: storage});
 router.post('/uploadAvatar', upload.single('avatar'), function(req, res, next) {
 	var avatar = req.file;
 	let suffixArr = avatar.originalname.split('.');
+	console.log(avatar.originalname)
 	let suffix = suffixArr[suffixArr.length-1];
-	console.log(avatar)
+	// console.log(avatar)
 	// var filename = '192.168.2.104:5000/public/' + req.session._id + '-avatar' + avatar.originalname.slice(avatar.originalname.length - 4);
 	let filename = `http://192.168.2.104:5000/public/uploads/${req.session.userId}-avatar.${suffix}`;
 	User.findByIdAndUpdate(req.session.userId, {
